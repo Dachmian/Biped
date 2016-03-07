@@ -1,0 +1,27 @@
+<biped_model>
+  <physical_parameters>
+    <description>basic randomized parameters set with uniform mass distribution</description>
+    <gravitational_constant model_parameter="g">9.81</gravitational_constant>
+    <stance_leg_parameters>
+      <mass model_parameter="m1">1.13</mass>
+      <length model_parameter="L1">1.2</length>
+      <CoM_position model_parameter="l1">0.6</CoM_position>
+      <inertia model_parameter="J1">0.1356</inertia>
+    </stance_leg_parameters>
+    <body_parameters>
+      <mass model_parameter="m2">2.15</mass>
+      <length model_parameter="L2">2.3</length>
+      <CoM_position model_parameter="l2">1.15</CoM_position>
+      <inertia model_parameter="J2">0.947791666667</inertia>
+    </body_parameters>
+    <swing_leg_parameters>
+      <mass model_parameter="m3">1.13</mass>
+      <length model_parameter="L3">1.2</length>
+      <CoM_position model_parameter="l3">0.6</CoM_position>
+      <inertia model_parameter="J3">0.1356</inertia>
+    </swing_leg_parameters>
+    <hips_mass_parameter>
+      <mass model_parameter="Mh">2.1</mass>
+    </hips_mass_parameter>
+  </physical_parameters>
+</biped_model>

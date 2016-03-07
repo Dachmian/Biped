@@ -1,0 +1,7 @@
+/home/damir/Coding/cs/BipedRobot/BipedRobot/obj/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/damir/Coding/cs/BipedRobot/BipedRobot/obj/Debug/BipedRobot.Properties.Resources.resources
+/home/damir/Coding/cs/BipedRobot/BipedRobot/bin/Debug/BipedRobot.exe.mdb
+/home/damir/Coding/cs/BipedRobot/BipedRobot/bin/Debug/BipedRobot.exe
+/home/damir/Coding/cs/BipedRobot/BipedRobot/obj/Debug/BipedRobot.exe
+/home/damir/Coding/cs/BipedRobot/BipedRobot/obj/Debug/BipedRobot.exe.mdb
+/home/damir/Coding/cs/BipedRobot/BipedRobot/bin/Debug/MathNet.Numerics.dll

@@ -1,0 +1,1 @@
+dq3 = dtheta * (0.1e1 + pow(tan(theta), 0.2e1));
