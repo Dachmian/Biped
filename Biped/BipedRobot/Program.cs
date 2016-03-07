@@ -8,10 +8,11 @@ namespace BipedRobot{
     static class Program{
         static void Main(string[] args)
         {
-            //Biped biped = new Biped (@"../../basic_randomized_set.xml");
-            //integration.run (ref biped);
-            //plotting.plotStates(biped);
+            Biped biped = new Biped (@"../../basic_randomized_set.xml");
+            integration.run (ref biped);
+            plotting.plotStates(biped);
             BRVHC vhc = new BRVHC();
+
         }
     }
 }

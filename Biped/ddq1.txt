@@ -1,1 +1,1 @@
-ddq1 = 0;
+ddq1 = ddtheta;

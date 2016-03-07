@@ -1,1 +1,1 @@
-dq2 = 0;
+dq2 = dtheta * cos(theta);
