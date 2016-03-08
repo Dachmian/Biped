@@ -99,7 +99,7 @@ namespace BipedRobot
         {
             foreach (var pair in gait.gaitParam.gaitparameters)
             {
-
+                pair.Key = 
             }
         }
         public static bool verifyParameters(BRgait gait)
