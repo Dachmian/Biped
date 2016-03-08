@@ -11,7 +11,7 @@ namespace BipedRobot{
             Biped biped = new Biped (@"../../basic_randomized_set.xml");
             integration.run (ref biped);
             plotting.plotStates(biped);
-            BRVHC vhc = new BRVHC();
+            gaitSearch.run(ref biped);
 
         }
     }

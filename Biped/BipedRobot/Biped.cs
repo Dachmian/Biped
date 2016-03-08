@@ -528,25 +528,33 @@ namespace BipedRobot
                 2 * param.L1 * param.l1 * param.m1 + param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) + Math.Pow(param.l1, 2) * param.m1 + param.J1;
 
 
-            double Qneg1 = -dq1 * param.L1 * param.l1 * param.m1 + dq1 * Math.Pow(param.l1, 2) * param.m1 + param.J1 * dq1;
-            double Qneg2 = dq1 * param.L1 * param.l2 * param.m1 * Math.Cos(-q2 + q1) + param.l2 * param.l2 * param.m1 * dq2 + param.J2 * dq2;
-            double Qneg3 = dq3 * param.l3 * param.l3 * param.m3 + dq1 * param.l1 * param.l1 * param.m1 + dq2 * param.l2 * param.l2 * param.m2 +
-                dq1 * param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) + dq2 * param.L3 * param.l2 * param.m2 * Math.Cos(q2 - q3) +
-                dq1 * param.L1 * param.L3 * param.m3 * Math.Cos(q1 - q3) + dq1 * param.L1 * param.l2 * param.m2 * Math.Cos(-q2 + q1) -
-                dq1 * param.L1 * param.l3 * param.m3 * Math.Cos(q1 - q3) - dq3 * param.L3 * param.l3 * param.m3 +
-                dq1 * param.L1 * param.L3 * param.m2 * Math.Cos(q1 - q3) - dq1 * param.L1 * param.l1 * param.m1 +
-                param.J3 * dq3 + param.J2 * dq2 + param.J1 * dq1;
+            double Qneg11 = -param.L1 * param.l1 * param.m1 + param.m1 * param.l1 * param.l1 + param.J1;
+            double Qneg12 = 0;
+            double Qneg13 = 0;
+            double Qneg21 = param.L1 * param.l2 * param.m1 * Math.Cos(q1 - q2);
+            double Qneg22 = param.l2 * param.l2 * param.m1 + param.J2;
+            double Qneg23 = 0;
+            double Qneg31 = param.J1 - param.L1 * param.l1 * param.m1 + param.L1 * param.L3 * param.m2 * Math.Cos(q1 - q3) + param.L1 * param.L3 * param.m3 * Math.Cos(q1 - q3) -
+                param.L1 * Math.Cos(q1 - q3) * param.l3 * param.m3 + param.L1 * Math.Cos(q1 - q2) * param.l2 * param.m2 + param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) + 
+                param.m1 * param.l1 * param.l1;
+            double Qneg32 = param.L3 * param.l2 * param.m2 * Math.Cos(-q3 + q2) + param.l2 * param.l2 * param.m2 + param.J2;
+            double Qneg33 = -param.L3 * param.l3 * param.m3 + param.l3 * param.l3 * param.m3 + param.J3;
 
-            Matrix<double> Qpos = Matrix<double>.Build.DenseOfArray(new double[,]
+            Matrix <double> Qpos = Matrix<double>.Build.DenseOfArray(new double[,]
             {
                 {Qpos11,Qpos12,Qpos13 },
                 {Qpos21,Qpos22,Qpos23 },
                 {Qpos31,Qpos32,Qpos33 }
             });
 
-            Vector<double> Qneg = Vector<double>.Build.Dense(new double[] { Qneg1, Qneg2, Qneg3 });
+            Matrix<double> Qneg = Matrix<double>.Build.DenseOfArray(new double[,]
+            {
+                {Qneg11,Qneg12,Qneg13 },
+                {Qneg21,Qneg22,Qneg23 },
+                {Qneg31,Qneg32,Qneg33 }
+            });
 
-            Vector<double> qpos = Qpos.Solve(Qneg);
+            Vector<double> qpos = Qpos.Solve(Qneg*data.currentDQ);
 
             return qpos;
         }

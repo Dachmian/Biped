@@ -24,9 +24,11 @@ namespace BipedRobot
         {
             StreamReader fs = null;
             fs = new StreamReader(@"../../../parameters.txt");
-            int temp = Int32.Parse(fs.ReadLine());
+            string temp = fs.ReadLine();
+            temp = temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1);
+            int tempint = Int32.Parse(temp);
             _gaitParameters = new Dictionary<string, double>();
-            for (int i = 0; i < temp; i++)
+            for (int i = 0; i < tempint; i++)
             {
                 _gaitParameters.Add("P" + i.ToString(), 0.0);
             }
@@ -86,8 +88,20 @@ namespace BipedRobot
         {
             //first time running use rand to find a valid gait
             BRgait gait = new BRgait(biped.param);
+            gait.impact(0);
         }
+        public static void setPosture(ref BRgait gait)
+        {
+            gait.gaitParam.intervalStart = -Math.PI / 4;
+            gait.gaitParam.intervalStart = Math.PI / 4;
+        }
+        public static void setParametersRandom(ref BRgait gait)
+        {
+            foreach (var pair in gait.gaitParam.gaitparameters)
+            {
 
+            }
+        }
         public static bool verifyParameters(BRgait gait)
         {
             double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.param.intervalStart, gait.param.intervalEnd, 2)) /
@@ -145,6 +159,12 @@ namespace BipedRobot
             temp = fs.ReadLine();
             temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
             _gamma = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../impact.txt");
+            temp = fs.ReadLine();
+            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(System.Double)","");
+            _impact = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
         }
         public double q1(double theta)
@@ -362,7 +382,7 @@ namespace BipedRobot
                 _vhc = value;
             }
         }
-        public BRGaitParameters param
+        public BRGaitParameters gaitParam
         {
             get
             {
