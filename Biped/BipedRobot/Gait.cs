@@ -88,7 +88,7 @@ namespace BipedRobot
         {
             //first time running use rand to find a valid gait
             BRgait gait = new BRgait(biped.param);
-            gait.impact(0);
+            gait.impact(0.2);
         }
         public static void setPosture(ref BRgait gait)
         {
@@ -99,13 +99,13 @@ namespace BipedRobot
         {
             foreach (var pair in gait.gaitParam.gaitparameters)
             {
-                pair.Key = 
+
             }
         }
         public static bool verifyParameters(BRgait gait)
         {
-            double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.param.intervalStart, gait.param.intervalEnd, 2)) /
-                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.param.intervalStart, gait.param.intervalEnd, 2)) * Math.Pow(gait.impact(gait.param.intervalEnd), 2));
+            double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 2)) /
+                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 2)) * Math.Pow(gait.impact(gait.gaitParam.intervalEnd), 2));
             if (thetaDotAtTSquare < 0)
             {
                 return false;
@@ -163,7 +163,7 @@ namespace BipedRobot
 
             fs = new StreamReader(@"../../../impact.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(System.Double)","");
+            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)","");
             _impact = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
         }
