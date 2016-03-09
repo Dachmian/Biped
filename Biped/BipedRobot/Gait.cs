@@ -579,15 +579,15 @@ namespace BipedRobot
 
         public double impactFirstLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.impactNegFirstLine(thetaStart, _gaitParam.gaitparameters, _physicalParam)/_vhc.impactPosFirstLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam);
+            return _vhc.impactNegFirstLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam)/_vhc.impactPosFirstLine(thetaStart, _gaitParam.gaitparameters, _physicalParam);
         }
         public double impactSecondLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.impactNegSecondLine(thetaStart, _gaitParam.gaitparameters, _physicalParam)/ _vhc.impactPosSecondLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam);
+            return _vhc.impactNegSecondLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam)/ _vhc.impactPosSecondLine(thetaStart, _gaitParam.gaitparameters, _physicalParam);
         }
         public double impactThirdLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.impactNegThirdLine(thetaStart, _gaitParam.gaitparameters, _physicalParam)/ _vhc.impactPosThirdLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam);
+            return _vhc.impactNegThirdLine(thetaEnd, _gaitParam.gaitparameters, _physicalParam)/ _vhc.impactPosThirdLine(thetaStart, _gaitParam.gaitparameters, _physicalParam);
         }
 
     }
