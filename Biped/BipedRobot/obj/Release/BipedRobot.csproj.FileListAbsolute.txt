@@ -31,3 +31,12 @@ C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobo
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\BipedRobot.exe.config
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.exe
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.pdb
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\BipedRobot.exe
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\BipedRobot.pdb
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\NCalc.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.csprojResolveAssemblyReference.cache
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.graph.resources
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Properties.Resources.resources
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.csproj.GenerateResource.Cache

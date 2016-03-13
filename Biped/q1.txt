@@ -1,1 +1,1 @@
-q1 = theta;
+q1 = cos(theta);

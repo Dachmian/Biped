@@ -1,1 +1,1 @@
-dq3 = -dtheta * sin(theta);
+dq3 = dtheta * sin(theta);

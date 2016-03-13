@@ -9,8 +9,8 @@ namespace BipedRobot{
         static void Main(string[] args)
         {
             Biped biped = new Biped (@"../../basic_randomized_set.xml");
-            integration.run (ref biped);
-            plotting.plotStates(biped);
+            //integration.run (ref biped);
+            //plotting.plotStates(biped);
             gaitSearch.run(ref biped);
 
         }

@@ -1,1 +1,1 @@
-q3 = cos(theta);
+q3 = -cos(theta);
