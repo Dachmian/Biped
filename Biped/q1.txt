@@ -1,1 +1,1 @@
-q1 = cos(theta);
+q1 = phi1;

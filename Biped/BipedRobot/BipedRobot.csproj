@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BezierCurve.cs" />
     <Compile Include="Biped.cs" />
     <Compile Include="Gait.cs" />
     <Compile Include="graph.cs">

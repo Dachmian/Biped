@@ -1,1 +1,1 @@
-dq1 = -dtheta * sin(theta);
+dq1 = dphi1 * dtheta;
