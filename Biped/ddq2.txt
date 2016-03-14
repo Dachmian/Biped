@@ -1,1 +1,1 @@
-ddq2 = ddtheta * cos(theta) - dtheta * dtheta * sin(theta);
+ddq2 = 0.20e1 * ddtheta * cos((double) (10 * theta)) - 0.200e2 * dtheta * dtheta * sin((double) (10 * theta));

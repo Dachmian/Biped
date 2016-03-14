@@ -1,1 +1,1 @@
-q2 = sin(theta);
+q2 = 0.2e0 * sin((double) (10 * theta));

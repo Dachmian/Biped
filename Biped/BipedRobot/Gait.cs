@@ -88,9 +88,9 @@ namespace BipedRobot
         {
             //first time running use rand to find a valid gait
             BRgait gait = new BRgait(biped.param);
-            Console.WriteLine(gait.impactFirstLine(-0.3,0.3));
-            Console.WriteLine(gait.impactSecondLine(-0.3, 0.3));
-            Console.WriteLine(gait.impactThirdLine(-0.3, 0.3));
+            Console.WriteLine(gait.impactFirstLine(-0.68, 0.68));
+            Console.WriteLine(gait.impactSecondLine(-0.68, 0.68));
+            Console.WriteLine(gait.impactThirdLine(-0.68, 0.68));
             setPosture(ref gait);
             verifyParameters(gait);
         }
@@ -111,6 +111,7 @@ namespace BipedRobot
             double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 20)) /
                 (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 20)) 
                 * Math.Pow(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd), 20));
+            Console.WriteLine(thetaDotAtTSquare);
             if (thetaDotAtTSquare < 0)
             {
                 return false;
@@ -138,6 +139,7 @@ namespace BipedRobot
         private Expression _impactNegFirstLine;
         private Expression _impactNegSecondLine;
         private Expression _impactNegThirdLine;
+
         public BRVHC(BRParameters param)
         {
             StreamReader fs = null;
