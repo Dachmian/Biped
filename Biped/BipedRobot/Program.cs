@@ -8,12 +8,11 @@ namespace BipedRobot{
     static class Program{
         static void Main(string[] args)
         {
-            //Biped biped = new Biped (@"../../basic_randomized_set.xml");
+            Biped biped = new Biped (@"../../basic_randomized_set.xml");
             //integration.run (ref biped);
             //plotting.plotStates(biped);
-            //gaitSearch.run(ref biped);
-            BezierCurve brc = new BezierCurve(3);
-            Console.WriteLine(brc.functionToString());
+            gaitSearch.run(ref biped);
+            
         }
     }
 }

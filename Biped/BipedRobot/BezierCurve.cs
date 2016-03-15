@@ -9,6 +9,7 @@ using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics;
+using System.Globalization;
 
 namespace BipedRobot
 {
@@ -18,18 +19,22 @@ namespace BipedRobot
     {
         private Matrix<double> _bezierMatrix;
         private int _numControlPoints;
+        private Vector<double> _q1controlpoints;
+        private Vector<double> _q2controlpoints;
+        private Vector<double> _q3controlpoints;
 
-        public BezierCurve(int n)
+        public BezierCurve(int n, BRgait gait)
         {
             _numControlPoints = n;
             setBezierMatrix(n);
+            setControlPoints(gait);
         }
         public void setBezierMatrix(int n)
         {
-            Matrix<double> matrix = Matrix<double>.Build.Dense(n+1, n+1);
-            for (int i = 0; i<= n; i++)
+            Matrix<double> matrix = Matrix<double>.Build.Dense(n, n);
+            for (int i = 0; i< n; i++)
             {
-                for(int j=0; j <=n; j++)
+                for(int j=0; j <n; j++)
                 {
                     if (((i + j)<n) && ((i + j) >= 0))
                     {
@@ -43,7 +48,13 @@ namespace BipedRobot
             }
             _bezierMatrix = matrix;
         }
-        public double binomialCoefficient(double n, double k)
+        public void setControlPoints(BRgait gait)
+        {
+            _q1controlpoints = gait.gaitParam.gaitparameters.Item1;
+            _q2controlpoints = gait.gaitParam.gaitparameters.Item2;
+            _q3controlpoints = gait.gaitParam.gaitparameters.Item3;
+        }
+        private double binomialCoefficient(double n, double k)
         {
             double r = 1;
             double d;
@@ -56,19 +67,105 @@ namespace BipedRobot
             return r;
         }
 
-        public string functionToString()
+        public string phi1ToString()
         {
             string str = "";
-            for (int i = 0; i<= _numControlPoints; i++)
+            Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
+            for (int i = 0; i < valueVector.Count; i++)
             {
-                double integer = 0;
-                for (int j = 0;j<= _numControlPoints; j++)
-                {
-                    integer += _bezierMatrix[i, j];
-                }
-                str += integer.ToString() + "*" + "Pow(theta," + (_numControlPoints - i).ToString() + ")" + " ";
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture)+"*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
             }
+            str += "0";
+            return str;
+        }
+        public string phi2ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
+            for (int i = 0; i < valueVector.Count; i++)
+            {
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+        public string phi3ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
+            for (int i = 0; i < valueVector.Count; i++)
+            {
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
 
+        public string dphi1ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
+            for (int i = 0; i < valueVector.Count-1; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+        public string dphi2ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
+            for (int i = 0; i < valueVector.Count - 1; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+        public string dphi3ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
+            for (int i = 0; i < valueVector.Count - 1; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+
+        public string ddphi1ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
+            for (int i = 0; i < valueVector.Count - 2; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+        public string ddphi2ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
+            for (int i = 0; i < valueVector.Count - 2; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+            }
+            str += "0";
+            return str;
+        }
+        public string ddphi3ToString()
+        {
+            string str = "";
+            Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
+            for (int i = 0; i < valueVector.Count - 2; i++)
+            {
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+            }
+            str += "0";
             return str;
         }
     }
