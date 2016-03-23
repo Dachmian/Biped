@@ -164,12 +164,35 @@ namespace BipedRobot
             //first time running use rand to find a valid gait
             int numberOfPoints = 5;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 200000; i++)
             {
                 setParametersRandom(ref gait);
                 setVHC(ref gait, numberOfPoints);
-                verifyParameters(gait);
+                if (verifyParameters(gait) && verifyImpact(gait))
+                {
+                    Console.WriteLine("found gait");
+                    Console.WriteLine(i);
+                    Console.WriteLine(gait.vhc.phi1.ParsedExpression);
+                    Console.WriteLine(gait.vhc.phi2.ParsedExpression);
+                    Console.WriteLine(gait.vhc.phi3.ParsedExpression);
+                    biped.gaits.Add(gait);
+                    gait = new BRgait(biped.param, numberOfPoints);
+                }
             }
+            StreamWriter fs = null;
+            fs = new StreamWriter(@"../../../foundGaits.txt");
+            foreach (BRgait g in biped.gaits)
+            {
+                fs.WriteLine(g.vhc.phi1.ParsedExpression);
+                fs.WriteLine(g.vhc.phi2.ParsedExpression);
+                fs.WriteLine(g.vhc.phi3.ParsedExpression);
+                fs.WriteLine(g.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                fs.WriteLine(g.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                fs.WriteLine(g.impactThirdLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                fs.WriteLine();
+            }
+            fs.Close();
+            
         }
         public static void setPosture(ref BRgait gait)
         {
@@ -181,21 +204,21 @@ namespace BipedRobot
             gait.gaitParam.gaitparameters.Item1[0] = gait.gaitParam.initialControlPointsq1[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item1.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item1[i] = gait.gaitParam.initialControlPointsq1[i] + 2 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item1[i] = gait.gaitParam.initialControlPointsq1[i] + 1 * (rndm.NextDouble() - 0.5);
                 
                     
             }
             gait.gaitParam.gaitparameters.Item2[0] = gait.gaitParam.initialControlPointsq2[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item2.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item2[i] = gait.gaitParam.initialControlPointsq2[i] + 2 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item2[i] = gait.gaitParam.initialControlPointsq2[i] + 1 * (rndm.NextDouble() - 0.5);
 
 
             }
             gait.gaitParam.gaitparameters.Item3[0] = gait.gaitParam.initialControlPointsq3[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item3.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item3[i] = gait.gaitParam.initialControlPointsq3[i] + 2 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item3[i] = gait.gaitParam.initialControlPointsq3[i] + 1 * (rndm.NextDouble() - 0.5);
 
 
             }
@@ -217,11 +240,11 @@ namespace BipedRobot
         }
         public static bool verifyParameters(BRgait gait)
         {
-            double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 20)) /
-                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 20)) 
+            double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 32)) /
+                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 32)) 
                 * Math.Pow(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd), 2));
-            Console.WriteLine(thetaDotAtTSquare);
-            if (thetaDotAtTSquare < 0)
+            //Console.WriteLine(thetaDotAtTSquare);
+            if (thetaDotAtTSquare < 0.1 || thetaDotAtTSquare > 10000 || thetaDotAtTSquare == double.NaN)
             {
                 return false;
             }
@@ -229,6 +252,21 @@ namespace BipedRobot
             {
                 return true;
             }
+        }
+        public static bool verifyImpact(BRgait gait)
+        {
+            double firstAndSecond = gait.impactFirstLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd) - 
+                gait.impactSecondLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd); 
+            double firstAndThird = gait.impactFirstLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd) - 
+                gait.impactThirdLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd);
+            if ((firstAndSecond <= 0.008 && firstAndSecond >= -0.008) && (firstAndThird <= 0.008 && firstAndThird >= -0.008)) 
+            {
+                Console.WriteLine(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                Console.WriteLine(gait.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                Console.WriteLine(gait.impactThirdLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                return true;
+            }
+            return false;
         }
     }
 

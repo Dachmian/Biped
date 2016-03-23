@@ -17,12 +17,13 @@ namespace BipedRobot
     {
         private BRParameters _param;
         private BRData _data;
-        private BRgait[] _gaits;
+        private List<BRgait> _gaits;
 
         public Biped(string fileName)
         {
             _param = XMLBRParser.getXMLData(fileName);
             _data = new BRData();
+            _gaits = new List<BRgait>();
         }
 
         public BRParameters param
@@ -49,7 +50,7 @@ namespace BipedRobot
             }
         }
 
-        public BRgait[] gaits
+        public List<BRgait> gaits
         {
             get
             {
