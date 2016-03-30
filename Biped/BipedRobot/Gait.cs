@@ -9,7 +9,7 @@ using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics;
-using NCalc;
+using MathNet.Symbolics;
 
 namespace BipedRobot
 {
@@ -53,29 +53,29 @@ namespace BipedRobot
         public void setInitialControlPoints(int numOfPoints)
         {
             _initialControlPointsq1[0] = _intervalStart;
-            _initialControlPointsq1[1] = -Math.PI/8;
+            _initialControlPointsq1[1] = _intervalStart/2;
             _initialControlPointsq1[2] = 0;
-            _initialControlPointsq1[3] = Math.PI/8;
+            _initialControlPointsq1[3] = _intervalEnd/2;
             _initialControlPointsq1[4] = _intervalEnd;
 
 
             _initialControlPointsq2[0] = 0;
-            _initialControlPointsq2[1] = Math.PI/9;
+            _initialControlPointsq2[1] = Math.PI/18;
             _initialControlPointsq2[2] = 0;
-            _initialControlPointsq2[3] = -Math.PI/9;
+            _initialControlPointsq2[3] = -Math.PI/18;
             _initialControlPointsq2[4] = 0;
 
 
             _initialControlPointsq3[0] = _intervalEnd;
-            _initialControlPointsq3[1] = Math.PI/8;
+            _initialControlPointsq3[1] = _intervalEnd / 2;
             _initialControlPointsq3[2] = 0;
-            _initialControlPointsq3[3] = -Math.PI/8;
+            _initialControlPointsq3[3] = _intervalStart/2;
             _initialControlPointsq3[4] = _intervalStart;
         }
         public void setPosture()
         {
-            _intervalStart = -Math.PI / 4;
-            _intervalEnd = Math.PI / 4;
+            _intervalStart = -Math.PI / 8;
+            _intervalEnd = Math.PI / 8;
         }
 
         public Tuple<Vector<double>, Vector<double>, Vector<double>> gaitparameters
@@ -172,9 +172,9 @@ namespace BipedRobot
                 {
                     Console.WriteLine("found gait");
                     Console.WriteLine(i);
-                    Console.WriteLine(gait.vhc.phi1.ParsedExpression);
-                    Console.WriteLine(gait.vhc.phi2.ParsedExpression);
-                    Console.WriteLine(gait.vhc.phi3.ParsedExpression);
+                    Infix.Format(gait.vhc.phi1);
+                    Infix.Format(gait.vhc.phi2);
+                    Infix.Format(gait.vhc.phi3);
                     biped.gaits.Add(gait);
                     gait = new BRgait(biped.param, numberOfPoints);
                 }
@@ -183,9 +183,9 @@ namespace BipedRobot
             fs = new StreamWriter(@"../../../foundGaits.txt");
             foreach (BRgait g in biped.gaits)
             {
-                fs.WriteLine(g.vhc.phi1.ParsedExpression);
-                fs.WriteLine(g.vhc.phi2.ParsedExpression);
-                fs.WriteLine(g.vhc.phi3.ParsedExpression);
+                fs.WriteLine(Infix.Format(g.vhc.phi1));
+                fs.WriteLine(Infix.Format(g.vhc.phi1));
+                fs.WriteLine(Infix.Format(g.vhc.phi1));
                 fs.WriteLine(g.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
                 fs.WriteLine(g.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
                 fs.WriteLine(g.impactThirdLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
@@ -194,31 +194,30 @@ namespace BipedRobot
             fs.Close();
             
         }
-        public static void setPosture(ref BRgait gait)
-        {
-            
-        }
         public static void setParametersRandom(ref BRgait gait)
         {
             Random rndm = new Random();
+            double legFactor = gait.gaitParam.initialControlPointsq1[0];
+
             gait.gaitParam.gaitparameters.Item1[0] = gait.gaitParam.initialControlPointsq1[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item1.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item1[i] = gait.gaitParam.initialControlPointsq1[i] + 1 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item1[i] = gait.gaitParam.initialControlPointsq1[i] + 2 * legFactor * (rndm.NextDouble() - 0.5);
                 
                     
             }
+            
             gait.gaitParam.gaitparameters.Item2[0] = gait.gaitParam.initialControlPointsq2[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item2.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item2[i] = gait.gaitParam.initialControlPointsq2[i] + 1 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item2[i] = gait.gaitParam.initialControlPointsq2[i] + 2 * (rndm.NextDouble() - 0.5);
 
 
             }
             gait.gaitParam.gaitparameters.Item3[0] = gait.gaitParam.initialControlPointsq3[0];
             for (int i = 1; i < gait.gaitParam.gaitparameters.Item3.Count; i++)
             {
-                gait.gaitParam.gaitparameters.Item3[i] = gait.gaitParam.initialControlPointsq3[i] + 1 * (rndm.NextDouble() - 0.5);
+                gait.gaitParam.gaitparameters.Item3[i] = gait.gaitParam.initialControlPointsq3[i] + 2 * legFactor * (rndm.NextDouble() - 0.5);
 
 
             }
@@ -226,17 +225,17 @@ namespace BipedRobot
         public static void setVHC(ref BRgait gait, int numberOfPoints)
         {
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            gait.vhc.phi1 = new Expression(brCrv.phi1ToString());
-            gait.vhc.phi2 = new Expression(brCrv.phi2ToString());
-            gait.vhc.phi3 = new Expression(brCrv.phi3ToString());
+            gait.vhc.phi1 = Infix.ParseOrUndefined(brCrv.phi1ToString());
+            gait.vhc.phi2 = Infix.ParseOrUndefined(brCrv.phi2ToString());
+            gait.vhc.phi3 = Infix.ParseOrUndefined(brCrv.phi3ToString());
 
-            gait.vhc.dphi1 = new Expression(brCrv.dphi1ToString());
-            gait.vhc.dphi2 = new Expression(brCrv.dphi2ToString());
-            gait.vhc.dphi3 = new Expression(brCrv.dphi3ToString());
+            gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
+            gait.vhc.dphi2 = Infix.ParseOrUndefined(brCrv.dphi2ToString());
+            gait.vhc.dphi3 = Infix.ParseOrUndefined(brCrv.dphi3ToString());
 
-            gait.vhc.ddphi1 = new Expression(brCrv.ddphi1ToString());
-            gait.vhc.ddphi2 = new Expression(brCrv.ddphi2ToString());
-            gait.vhc.ddphi3 = new Expression(brCrv.ddphi3ToString());
+            gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
+            gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
+            gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
         }
         public static bool verifyParameters(BRgait gait)
         {
@@ -259,7 +258,7 @@ namespace BipedRobot
                 gait.impactSecondLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd); 
             double firstAndThird = gait.impactFirstLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd) - 
                 gait.impactThirdLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd);
-            if ((firstAndSecond <= 0.008 && firstAndSecond >= -0.008) && (firstAndThird <= 0.008 && firstAndThird >= -0.008)) 
+            if ((firstAndSecond <= 0.001 && firstAndSecond >= -0.001) && (firstAndThird <= 0.001 && firstAndThird >= -0.001)) 
             {
                 Console.WriteLine(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
                 Console.WriteLine(gait.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
@@ -272,85 +271,78 @@ namespace BipedRobot
 
     public class BRVHC
     {
-        public BRVHC(BRParameters param)
+        private Dictionary<string, FloatingPoint> _parameters;
+        public BRVHC(BRParameters param, int numberOfPoints)
         {
+            _parameters = new Dictionary<string, FloatingPoint>();
+
             StreamReader fs = null;
             fs = new StreamReader(@"../../../q3.txt");
             string temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _q3 = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _q3);
+            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
+            _q3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../ddq3.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _ddq3 = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _ddq3);
+            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
+            _ddq3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../alpha.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _alpha = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _alpha);
+            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
+            _alpha = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../beta.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _beta = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _beta);
+            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
+            _beta = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../gamma.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _gamma = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _gamma);
+            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
+            _gamma = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactPosFirstLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactPosFirstLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactPosFirstLine);
+            temp = temp.Replace("(double)", "").Replace("0.2e1","2");
+            _impactPosFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactPosSecondLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactPosSecondLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactPosSecondLine);
+            temp = temp.Replace("(double)", "").Replace("0.2e1", "2");
+            _impactPosSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactPosThirdLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactPosThirdLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactPosThirdLine);
+            temp = temp.Replace("(double)", "").Replace("0.2e1", "2");
+            _impactPosThirdLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactNegFirstLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactNegFirstLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactNegFirstLine);
+            temp = temp.Replace("(double)", "");
+            _impactNegFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactNegSecondLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactNegSecondLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactNegSecondLine);
+            temp = temp.Replace("(double)", "");
+            _impactNegSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactNegThirdLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow").Replace("(double)", "");
-            _impactNegThirdLine = new Expression(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            setPhysicalParameters(param, ref _impactNegThirdLine);
+            temp = temp.Replace("(double)", "");
+            _impactNegThirdLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
+            setPhysicalParameters(param, numberOfPoints);
         }
         #region general coordinates
         private Expression _q1;
@@ -375,8 +367,8 @@ namespace BipedRobot
         }
         public double evalq3(double theta)
         {
-            _q3.Parameters["theta"] = theta;
-            return (double)_q3.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _q3).RealValue;
         }
 
         public double evaldq1(double theta, double dtheta)
@@ -402,11 +394,11 @@ namespace BipedRobot
         }
         public double evalddq3(double theta, double dtheta, double ddtheta)
         {
-            _ddq3.Parameters["theta"] = theta;
-            _ddq3.Parameters["dtheta"] = dtheta;
-            _ddq3.Parameters["ddtheta"] = ddtheta;
+            _parameters["theta"] = theta;
+            _parameters["dtheta"] = dtheta;
+            _parameters["ddtheta"] = ddtheta;
 
-            return (double)_ddq3.Evaluate();
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddq3).RealValue;
         }
 
         public Expression q1
@@ -526,50 +518,50 @@ namespace BipedRobot
 
         public double evalPhi1(double theta)
         {
-            _phi1.Parameters["theta"] = theta;
-            return (double)_phi1.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi1).RealValue;
         }
         public double evalPhi2(double theta)
         {
-            _phi2.Parameters["theta"] = theta;
-            return (double)_phi2.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi2).RealValue;
         }
         public double evalPhi3(double theta)
         {
-            _phi3.Parameters["theta"] = theta;
-            return (double)_phi3.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi3).RealValue;
         }
 
         public double evalDphi1(double theta)
         {
-            _dphi1.Parameters["theta"] = theta;
-            return (double)_dphi1.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi1).RealValue;
         }
         public double evalDphi2(double theta)
         {
-            _dphi2.Parameters["theta"] = theta;
-            return (double)_dphi2.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi2).RealValue;
         }
         public double evalDphi3(double theta)
         {
-            _dphi3.Parameters["theta"] = theta;
-            return (double)_dphi3.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi3).RealValue;
         }
 
         public double evalDdphi1(double theta)
         {
-            _ddphi1.Parameters["theta"] = theta;
-            return (double)_ddphi1.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi1).RealValue;
         }
         public double evalDdphi2(double theta)
         {
-            _ddphi2.Parameters["theta"] = theta;
-            return (double)_ddphi2.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi2).RealValue;
         }
         public double evalDdphi3(double theta)
         {
-            _ddphi3.Parameters["theta"] = theta;
-            return (double)_ddphi3.Evaluate();
+            _parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi3).RealValue;
         }
 
         public Expression phi1
@@ -681,103 +673,79 @@ namespace BipedRobot
 
         public double evalAlpha(double theta)
         {
-            _alpha.Parameters["theta"] = theta;
-            _alpha.Parameters["phi1"] = evalPhi1(theta);
-            _alpha.Parameters["phi2"] = evalPhi2(theta);
-            _alpha.Parameters["phi3"] = evalPhi3(theta);
-            _alpha.Parameters["dphi1"] = evalDphi1(theta);
-            _alpha.Parameters["dphi2"] = evalDphi2(theta);
-            _alpha.Parameters["dphi3"] = evalDphi3(theta);
-            _alpha.Parameters["ddphi1"] = evalDphi1(theta);
-            _alpha.Parameters["ddphi2"] = evalDphi2(theta);
-            _alpha.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)_alpha.Evaluate();
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue;
         }
         public double evalBeta(double theta)
         {
-            _beta.Parameters["theta"] = theta;
-            _beta.Parameters["phi1"] = evalPhi1(theta);
-            _beta.Parameters["phi2"] = evalPhi2(theta);
-            _beta.Parameters["phi3"] = evalPhi3(theta);
-            _beta.Parameters["dphi1"] = evalDphi1(theta);
-            _beta.Parameters["dphi2"] = evalDphi2(theta);
-            _beta.Parameters["dphi3"] = evalDphi3(theta);
-            _beta.Parameters["ddphi1"] = evalDphi1(theta);
-            _beta.Parameters["ddphi2"] = evalDphi2(theta);
-            _beta.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)_beta.Evaluate();
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta).RealValue;
         }
         public double evalGamma(double theta)
         {
-            _gamma.Parameters["theta"] = theta;
-            _gamma.Parameters["phi1"] = evalPhi1(theta);
-            _gamma.Parameters["phi2"] = evalPhi2(theta);
-            _gamma.Parameters["phi3"] = evalPhi3(theta);
-            _gamma.Parameters["dphi1"] = evalDphi1(theta);
-            _gamma.Parameters["dphi2"] = evalDphi2(theta);
-            _gamma.Parameters["dphi3"] = evalDphi3(theta);
-            _gamma.Parameters["ddphi1"] = evalDphi1(theta);
-            _gamma.Parameters["ddphi2"] = evalDphi2(theta);
-            _gamma.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)_gamma.Evaluate();
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue;
         }
 
         public double evalTwoTimesBetaDividedByAlpha(double theta)
         {
-            _alpha.Parameters["theta"] = theta;
-            _alpha.Parameters["phi1"] = evalPhi1(theta);
-            _alpha.Parameters["phi2"] = evalPhi2(theta);
-            _alpha.Parameters["phi3"] = evalPhi3(theta);
-            _alpha.Parameters["dphi1"] = evalDphi1(theta);
-            _alpha.Parameters["dphi2"] = evalDphi2(theta);
-            _alpha.Parameters["dphi3"] = evalDphi3(theta);
-            _alpha.Parameters["ddphi1"] = evalDphi1(theta);
-            _alpha.Parameters["ddphi2"] = evalDphi2(theta);
-            _alpha.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            _beta.Parameters["theta"] = theta;
-            _beta.Parameters["phi1"] = evalPhi1(theta);
-            _beta.Parameters["phi2"] = evalPhi2(theta);
-            _beta.Parameters["phi3"] = evalPhi3(theta);
-            _beta.Parameters["dphi1"] = evalDphi1(theta);
-            _beta.Parameters["dphi2"] = evalDphi2(theta);
-            _beta.Parameters["dphi3"] = evalDphi3(theta);
-            _beta.Parameters["ddphi1"] = evalDphi1(theta);
-            _beta.Parameters["ddphi2"] = evalDphi2(theta);
-            _beta.Parameters["ddphi3"] = evalDphi3(theta);
-
-            return (2 * (double)_beta.Evaluate() / (double)_alpha.Evaluate());
+            return (2 * (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta).RealValue / (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue);
         }
         public double evalTwoTimesGammaDividedByAlpha(double theta)
         {
-            _gamma.Parameters["theta"] = theta;
-            _gamma.Parameters["phi1"] = evalPhi1(theta);
-            _gamma.Parameters["phi2"] = evalPhi2(theta);
-            _gamma.Parameters["phi3"] = evalPhi3(theta);
-            _gamma.Parameters["dphi1"] = evalDphi1(theta);
-            _gamma.Parameters["dphi2"] = evalDphi2(theta);
-            _gamma.Parameters["dphi3"] = evalDphi3(theta);
-            _gamma.Parameters["ddphi1"] = evalDphi1(theta);
-            _gamma.Parameters["ddphi2"] = evalDphi2(theta);
-            _gamma.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            _alpha.Parameters["theta"] = theta;
-            _alpha.Parameters["phi1"] = evalPhi1(theta);
-            _alpha.Parameters["phi2"] = evalPhi2(theta);
-            _alpha.Parameters["phi3"] = evalPhi3(theta);
-            _alpha.Parameters["dphi1"] = evalDphi1(theta);
-            _alpha.Parameters["dphi2"] = evalDphi2(theta);
-            _alpha.Parameters["dphi3"] = evalDphi3(theta);
-            _alpha.Parameters["ddphi1"] = evalDphi1(theta);
-            _alpha.Parameters["ddphi2"] = evalDphi2(theta);
-            _alpha.Parameters["ddphi3"] = evalDphi3(theta);
-
-
-
-            return (2 * (double)_gamma.Evaluate() / (double)_alpha.Evaluate());
+            return (2 * (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue / (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue);
         }
         #endregion
         #region impacts
@@ -792,111 +760,134 @@ namespace BipedRobot
 
         public double evalImpactPosFirstLine(double theta)
         {
-            _impactPosFirstLine.Parameters["theta"] = theta;
-            _impactPosFirstLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactPosFirstLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactPosFirstLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactPosFirstLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactPosFirstLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactPosFirstLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactPosFirstLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactPosFirstLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactPosFirstLine.Parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)_impactPosFirstLine.Evaluate();
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosFirstLine).RealValue;
         }
         public double evalImpactPosSecondLine(double theta)
         {
-            _impactPosSecondLine.Parameters["theta"] = theta;
-            _impactPosSecondLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactPosSecondLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactPosSecondLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactPosSecondLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactPosSecondLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactPosSecondLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactPosSecondLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactPosSecondLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactPosSecondLine.Parameters["ddphi3"] = evalDphi3(theta);
-            
-            return (double)_impactPosSecondLine.Evaluate();
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosSecondLine).RealValue;
         }
         public double evalImpactPosThirdLine(double theta)
         {
-            _impactPosThirdLine.Parameters["theta"] = theta;
-            _impactPosThirdLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactPosThirdLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactPosThirdLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactPosThirdLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactPosThirdLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactPosThirdLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactPosThirdLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactPosThirdLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactPosThirdLine.Parameters["ddphi3"] = evalDphi3(theta);
-            return (double)_impactPosThirdLine.Evaluate();
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosThirdLine).RealValue;
         }
 
         public double evalImpactNegFirstLine(double theta)
         {
-            _impactNegFirstLine.Parameters["theta"] = theta;
-            _impactNegFirstLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactNegFirstLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactNegFirstLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactNegFirstLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactNegFirstLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactNegFirstLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactNegFirstLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactNegFirstLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactNegFirstLine.Parameters["ddphi3"] = evalDphi3(theta);
-            
-            return (double)_impactNegFirstLine.Evaluate();
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegFirstLine).RealValue;
         }
         public double evalImpactNegSecondLine(double theta)
         {
-            _impactNegSecondLine.Parameters["theta"] = theta;
-            _impactNegSecondLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactNegSecondLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactNegSecondLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactNegSecondLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactNegSecondLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactNegSecondLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactNegSecondLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactNegSecondLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactNegSecondLine.Parameters["ddphi3"] = evalDphi3(theta);
-            return (double)_impactNegSecondLine.Evaluate();
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegSecondLine).RealValue;
         }
         public double evalImpactNegThirdLine(double theta)
         {
-            _impactNegThirdLine.Parameters["theta"] = theta;
-            _impactNegThirdLine.Parameters["phi1"] = evalPhi1(theta);
-            _impactNegThirdLine.Parameters["phi2"] = evalPhi2(theta);
-            _impactNegThirdLine.Parameters["phi3"] = evalPhi3(theta);
-            _impactNegThirdLine.Parameters["dphi1"] = evalDphi1(theta);
-            _impactNegThirdLine.Parameters["dphi2"] = evalDphi2(theta);
-            _impactNegThirdLine.Parameters["dphi3"] = evalDphi3(theta);
-            _impactNegThirdLine.Parameters["ddphi1"] = evalDphi1(theta);
-            _impactNegThirdLine.Parameters["ddphi2"] = evalDphi2(theta);
-            _impactNegThirdLine.Parameters["ddphi3"] = evalDphi3(theta);
-            return (double)_impactNegThirdLine.Evaluate();
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDphi1(theta);
+            _parameters["ddphi2"] = evalDphi2(theta);
+            _parameters["ddphi3"] = evalDphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegThirdLine).RealValue;
         }
         #endregion
-        public void setPhysicalParameters(BRParameters param, ref Expression exp)
+        public void setPhysicalParameters(BRParameters param, int numberOfPoints)
         {
-            exp.Parameters["g"] = param.g;
-            exp.Parameters["m1"] = param.m1;
-            exp.Parameters["m2"] = param.m2;
-            exp.Parameters["m3"] = param.m3;
+            _parameters.Add("g", param.g);
+            _parameters.Add("m1", param.m1);
+            _parameters.Add("m2", param.m2);
+            _parameters.Add("m3", param.m3);
 
-            exp.Parameters["l1"] = param.l1;
-            exp.Parameters["l2"] = param.l2;
-            exp.Parameters["l3"] = param.l3;
+            _parameters.Add("l1", param.l1);
+            _parameters.Add("l2", param.l2);
+            _parameters.Add("l3", param.l3);
 
-            exp.Parameters["L1"] = param.L1;
-            exp.Parameters["L2"] = param.L2;
-            exp.Parameters["L3"] = param.L3;
+            _parameters.Add("L1", param.L1);
+            _parameters.Add("L2", param.L2);
+            _parameters.Add("L3", param.L3);
 
-            exp.Parameters["J1"] = param.J1;
-            exp.Parameters["J2"] = param.J2;
-            exp.Parameters["J3"] = param.J3;
+            _parameters.Add("J1", param.J1);
+            _parameters.Add("J2", param.J2);
+            _parameters.Add("J3", param.J3);
+
+            _parameters.Add("phi1", 0);
+            _parameters.Add("phi2", 0);
+            _parameters.Add("phi3", 0);
+
+            _parameters.Add("dphi1", 0);
+            _parameters.Add("dphi2", 0);
+            _parameters.Add("dphi3", 0);
+
+            _parameters.Add("ddphi1", 0);
+            _parameters.Add("ddphi2", 0);
+            _parameters.Add("ddphi3", 0);
+
+            _parameters.Add("theta", 0);
+            _parameters.Add("dtheta", 0);
+            _parameters.Add("ddtheta", 0);
+
+            for (int i = 1; i <= numberOfPoints; i++)
+            {
+                _parameters.Add("P"+ i.ToString(), 0);
+            }
         }
 
 
@@ -910,7 +901,7 @@ namespace BipedRobot
 
         public BRgait(BRParameters param, int numberOfPoints)
         {
-            _vhc = new BRVHC(param);
+            _vhc = new BRVHC(param, numberOfPoints);
             _gaitParam = new BRGaitParameters(numberOfPoints);
         }
         public BRVHC vhc
@@ -944,7 +935,7 @@ namespace BipedRobot
 
         public double secondIntegral(double theta)
         {
-            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, _gaitParam.intervalStart, theta, 2);
+            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, _gaitParam.intervalStart, theta, 32);
             return Math.Exp(a) * _vhc.evalTwoTimesGammaDividedByAlpha(theta);
         }
 
@@ -960,6 +951,14 @@ namespace BipedRobot
         {
             return _vhc.evalImpactNegThirdLine(thetaEnd)/ _vhc.evalImpactPosThirdLine(thetaStart);
         }
+
+    }
+
+
+    public static class SQP
+    {
+
+
 
     }
 }

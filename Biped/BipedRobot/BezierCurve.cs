@@ -73,9 +73,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture)+"*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture)+" * " + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string phi2ToString()
@@ -84,9 +85,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string phi3ToString()
@@ -95,9 +97,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i) + ")" + "+";
+                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
 
@@ -107,9 +110,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
             for (int i = 0; i < valueVector.Count-1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string dphi2ToString()
@@ -118,9 +122,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
             for (int i = 0; i < valueVector.Count - 1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string dphi3ToString()
@@ -129,9 +134,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
             for (int i = 0; i < valueVector.Count - 1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
 
@@ -141,9 +147,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string ddphi2ToString()
@@ -152,9 +159,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
         public string ddphi3ToString()
@@ -163,9 +171,10 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "Pow(theta," + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
+            str = str.Replace("+-", "-");
             return str;
         }
     }
