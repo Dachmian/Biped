@@ -176,9 +176,17 @@ namespace BipedRobot
                     Infix.Format(gait.vhc.phi2);
                     Infix.Format(gait.vhc.phi3);
                     biped.gaits.Add(gait);
-                    gait = new BRgait(biped.param, numberOfPoints);
+                    break;
                 }
             }
+            //begin search
+            SQP sqp = new SQP(gait.vhc);
+
+
+
+
+
+            //write to file
             StreamWriter fs = null;
             fs = new StreamWriter(@"../../../foundGaits.txt");
             foreach (BRgait g in biped.gaits)
@@ -848,6 +856,74 @@ namespace BipedRobot
 
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegThirdLine).RealValue;
         }
+
+        public Expression impactPosFirstLine
+        {
+            get
+            {
+                return _impactPosFirstLine;
+            }
+            set
+            {
+                _impactPosFirstLine = value;
+            }
+        }
+        public Expression impactPosSecondLine
+        {
+            get
+            {
+                return _impactPosSecondLine;
+            }
+            set
+            {
+                _impactPosSecondLine = value;
+            }
+        }
+        public Expression impactPosThirdLine
+        {
+            get
+            {
+                return _impactPosThirdLine;
+            }
+            set
+            {
+                _impactPosThirdLine = value;
+            }
+        }
+
+        public Expression impactNegFirstLine
+        {
+            get
+            {
+                return _impactNegFirstLine;
+            }
+            set
+            {
+                _impactNegFirstLine = value;
+            }
+        }
+        public Expression impactNegSecondLine
+        {
+            get
+            {
+                return _impactNegSecondLine;
+            }
+            set
+            {
+                _impactNegSecondLine = value;
+            }
+        }
+        public Expression impactNegThirdLine
+        {
+            get
+            {
+                return _impactNegThirdLine;
+            }
+            set
+            {
+                _impactNegThirdLine = value;
+            }
+        }
         #endregion
         public void setPhysicalParameters(BRParameters param, int numberOfPoints)
         {
@@ -955,9 +1031,86 @@ namespace BipedRobot
     }
 
 
-    public static class SQP
+    //the performanceindex is to be integrated from theta0 to thetaT 
+    public class SQP
     {
+        private Expression _performanceIndex;
+        private Expression _ineqConstraint1;
+        private Expression _ineqConstraint2;
+        private Expression _eqConstraint1;
+        private Expression _eqConstraint2;
 
+        public SQP(BRVHC vhc)
+        {
+            
+            Expression ddtheta = Expression.Symbol("ddtheta");
+            Expression dthetaSquared = Expression.Symbol("dtheta^2");
+            Expression theta = Expression.Symbol("theta");
+
+            StreamReader fs = null;
+            fs = new StreamReader(@"../../../alpha1.txt");
+            string temp = fs.ReadLine();
+            Expression alpha1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            alpha1 = Structure.Substitute("dphi1", vhc.dphi1, alpha1);
+            alpha1 = Structure.Substitute("dphi2", vhc.dphi2, alpha1);
+            alpha1 = Structure.Substitute("dphi3", vhc.dphi3, alpha1);
+            fs.Close();
+
+            fs = new StreamReader(@"../../../beta1.txt");
+            temp = fs.ReadLine();
+            Expression beta1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            beta1 = Structure.Substitute("dphi2", vhc.dphi2, beta1);
+            beta1 = Structure.Substitute("dphi3", vhc.dphi3, beta1);
+            beta1 = Structure.Substitute("ddphi1", vhc.ddphi1, beta1);
+            beta1 = Structure.Substitute("ddphi2", vhc.ddphi2, beta1);
+            fs.Close();
+
+            fs = new StreamReader(@"../../../gamma1.txt");
+            temp = fs.ReadLine();
+            Expression gamma1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            _ineqConstraint1 = alpha1 * ddtheta + beta1 * dthetaSquared + gamma1 - 150;
+
+
+            fs = new StreamReader(@"../../../alpha3.txt");
+            temp = fs.ReadLine();
+            Expression alpha3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            alpha3 = Structure.Substitute("dphi1", vhc.dphi1, alpha3);
+            alpha3 = Structure.Substitute("dphi3", vhc.dphi3, alpha3);
+            fs.Close();
+
+            fs = new StreamReader(@"../../../beta3.txt");
+            temp = fs.ReadLine();
+            Expression beta3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            beta3 = Structure.Substitute("dphi1", vhc.dphi1, beta3);
+            beta3 = Structure.Substitute("dphi3", vhc.dphi3, beta3);
+            beta3 = Structure.Substitute("ddphi1", vhc.ddphi1, beta3);
+            fs.Close();
+
+            fs = new StreamReader(@"../../../gamma3.txt");
+            temp = fs.ReadLine();
+            Expression gamma3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            _ineqConstraint2 = alpha3 * ddtheta + beta3 * dthetaSquared + gamma3 -150;
+
+            _performanceIndex = (alpha1 * ddtheta + beta1 * dthetaSquared + gamma1) * vhc.dphi1 + (alpha3 * ddtheta + beta3 * dthetaSquared + gamma3) * vhc.dphi3;
+
+            _eqConstraint1 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegSecondLine/vhc.impactPosSecondLine;
+            _eqConstraint2 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegThirdLine / vhc.impactPosThirdLine;
+        }
+
+
+        public double EvalPerformanceIndex()
+        {
+            return 0;
+        }
+
+        public void run()
+        {
+            
+        }
 
 
     }

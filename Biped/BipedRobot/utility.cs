@@ -78,7 +78,7 @@ namespace BipedRobot{
     }
 
 
-    public static class integration
+    public static class IntegrationFullDynamics
     {
 
 		public static void setInitialConditions(ref Biped biped)
@@ -127,7 +127,6 @@ namespace BipedRobot{
             return val;
         }
 
-
         public static void integrateUntilConditionGEO(ref Biped biped)
 		{
 			if (stoppingConditionABS (biped.data.currentQ) < 0) {
@@ -141,8 +140,8 @@ namespace BipedRobot{
 		{
 			Vector<double> oneStep;
 			for (int i = 0; i<biped.data.time.Length-1; i++) {
-				//oneStep = rk4 (biped);
-                oneStep = constantStep(biped);
+				oneStep = rk4 (biped);
+                //oneStep = constantStep(biped);
 				
 				biped.data.RES [i+1] = new Tuple<Vector<double>,double> (oneStep, biped.data.time [i+1]);
 				biped.data.currentQ = Vector<double>.Build.Dense (new double[] {oneStep[0], oneStep[1], oneStep[2] });
@@ -163,10 +162,6 @@ namespace BipedRobot{
             updateAfterImpact(ref biped);
 		}
 
-
-
-
-
 		public static Vector<double> rk4(Biped biped)
 		{
 			double dx = biped.data.timestep;
@@ -185,9 +180,6 @@ namespace BipedRobot{
 				sixth * (k1 + 2 * k2 + 2 * k3 + k4));
 		}
 
-
-
-
         public static Vector<double> constantStep(Biped biped)
         {
             double dx = biped.data.timestep;
@@ -198,7 +190,6 @@ namespace BipedRobot{
             return Vector<double>.Build.Dense(new double[] { q[0], q[1], q[2], dq[0], dq[1], dq[2] });
         }
 
-
         public static void updateAfterImpact(ref Biped biped)
         {
             Vector<double> DQ = BRDynamics.impactMapAngularMomentum(biped);
@@ -207,10 +198,32 @@ namespace BipedRobot{
             biped.data.currentQ = Q;
             biped.data.currentDQ = DQ;
         }
-
-
     }
 
+    public static class integrationReducedDynamics
+    {
+        
+
+        public static void run(BRVHC vhc)
+        {
+            
+        }
+
+        public static Vector<double> rk4(Vector<double> THETA, BRVHC vhc)
+        {
+            double dx = 0.01;
+            double halfdx = 0.5 * dx;
+            double sixth = 1.0 / 6.0;
+
+            Vector<double> k0 = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0, 0 });
+            Vector<double> k1 = dx * BRReducedDynamics.rhs2D(THETA + k0, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k2 = dx * BRReducedDynamics.rhs2D(THETA + k1 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k3 = dx * BRReducedDynamics.rhs2D(THETA + k2 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k4 = dx * BRReducedDynamics.rhs2D(THETA + k3 * dx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+
+            return + sixth * (k1 + 2 * k2 + 2 * k3 + k4);
+        }
+    }
 
     public static class plotting
     {

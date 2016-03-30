@@ -572,4 +572,50 @@ namespace BipedRobot
             return ss.Multiply(biped.data.currentQ);
         }
     }
+
+    public class BRReducedData
+    {
+        private Tuple<Vector<double>, double>[] _RES;
+        private double _timestep;
+
+        public Tuple<Vector<double>, double>[] RES
+        {
+            get
+            {
+                return _RES;
+            }
+            set
+            {
+                _RES = value;
+            }
+        }
+        public double timestep
+        {
+            get
+            {
+                return _timestep;
+            }
+            set
+            {
+                _timestep = value;
+            }
+        }
+    }
+
+    public static class BRReducedDynamics
+    {
+        public delegate double coefficientFunction(double theta);
+
+        public static double rhs1D(Vector<double> THETA, coefficientFunction alpha, coefficientFunction beta, coefficientFunction gamma)
+        {
+            double ddtheta = (-beta(THETA[0]) * Math.Pow(THETA[1], 2) - gamma(THETA[0])) / alpha(THETA[0]);
+            return ddtheta;
+        }
+
+        public static Vector<double> rhs2D(Vector<double> THETA, coefficientFunction alpha, coefficientFunction beta, coefficientFunction gamma)
+        {
+            Vector<double> rhs2D = Vector.Build.Dense(new double[] {THETA[1] ,rhs1D(THETA, alpha, beta, gamma)});
+            return rhs2D;
+        }
+    }
 }
