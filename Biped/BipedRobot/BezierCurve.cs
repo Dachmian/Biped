@@ -67,41 +67,47 @@ namespace BipedRobot
             return r;
         }
 
-        public string phi1ToString()
+        public Tuple<Dictionary<string,double>,string> phi1ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
+            Dictionary<string, double> parameters = new Dictionary<string, double>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture)+" * " + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P"+i.ToString()+" * " + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                parameters.Add("P" + i.ToString(), valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return str;
+            return new Tuple<Dictionary<string, double>, string>(parameters, str);
         }
-        public string phi2ToString()
+        public Tuple<Dictionary<string, double>, string> phi2ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
+            Dictionary<string, double> parameters = new Dictionary<string, double>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                parameters.Add("P" + (i + _numControlPoints).ToString(), valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return str;
+            return new Tuple<Dictionary<string, double>, string>(parameters, str);
         }
-        public string phi3ToString()
+        public Tuple<Dictionary<string, double>, string> phi3ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
+            Dictionary<string, double> parameters = new Dictionary<string, double>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += valueVector[i].ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P" + (i + 2*_numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                parameters.Add("P" + (i + 2*_numControlPoints).ToString(), valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return str;
+            return new Tuple<Dictionary<string, double>, string>(parameters, str);
         }
 
         public string dphi1ToString()
@@ -110,7 +116,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
             for (int i = 0; i < valueVector.Count-1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -122,7 +128,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
             for (int i = 0; i < valueVector.Count - 1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -134,7 +140,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
             for (int i = 0; i < valueVector.Count - 1; i++)
             {
-                str += ((_numControlPoints - 1 - i) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -147,7 +153,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -159,7 +165,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -171,7 +177,7 @@ namespace BipedRobot
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
             for (int i = 0; i < valueVector.Count - 2; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1) * valueVector[i]).ToString(CultureInfo.InvariantCulture) + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");

@@ -233,6 +233,7 @@ namespace BipedRobot
         public static void setVHC(ref BRgait gait, int numberOfPoints)
         {
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
+            Tuple<Dictionary<string, double>, string> tuple = new Tuple<Dictionary<string, double>, string>();
             gait.vhc.phi1 = Infix.ParseOrUndefined(brCrv.phi1ToString());
             gait.vhc.phi2 = Infix.ParseOrUndefined(brCrv.phi2ToString());
             gait.vhc.phi3 = Infix.ParseOrUndefined(brCrv.phi3ToString());
@@ -279,7 +280,6 @@ namespace BipedRobot
 
     public class BRVHC
     {
-        private Dictionary<string, FloatingPoint> _parameters;
         public BRVHC(BRParameters param, int numberOfPoints)
         {
             _parameters = new Dictionary<string, FloatingPoint>();
@@ -352,6 +352,57 @@ namespace BipedRobot
             fs.Close();
             setPhysicalParameters(param, numberOfPoints);
         }
+        #region parameters
+        private Dictionary<string, FloatingPoint> _parameters;
+        private Dictionary<string, FloatingPoint> _phi1Parameters;
+        private Dictionary<string, FloatingPoint> _phi2Parameters;
+        private Dictionary<string, FloatingPoint> _phi3Parameters;
+
+        public Dictionary<string, FloatingPoint> parameters
+        {
+            get
+            {
+                return _parameters;
+            }
+            set
+            {
+                _parameters = value;
+            }
+        }
+        public Dictionary<string, FloatingPoint> phi1Parameters
+        {
+            get
+            {
+                return _phi1Parameters;
+            }
+            set
+            {
+                _phi1Parameters = value;
+            }
+        }
+        public Dictionary<string, FloatingPoint> phi2Parameters
+        {
+            get
+            {
+                return _phi2Parameters;
+            }
+            set
+            {
+                _phi2Parameters = value;
+            }
+        }
+        public Dictionary<string, FloatingPoint> phi3Parameters
+        {
+            get
+            {
+                return _phi3Parameters;
+            }
+            set
+            {
+                _phi3Parameters = value;
+            }
+        }
+        #endregion
         #region general coordinates
         private Expression _q1;
         private Expression _q2;

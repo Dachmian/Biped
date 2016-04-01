@@ -51,3 +51,13 @@ C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRo
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FSharp.Core.xml
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Numerics.FSharp.xml
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Symbolics.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FParsec.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FParsecCS.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FSharp.Core.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Numerics.FSharp.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Symbolics.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FParsec.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FParsecCS.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FSharp.Core.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Numerics.FSharp.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Symbolics.xml
