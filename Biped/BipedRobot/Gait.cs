@@ -1177,12 +1177,32 @@ namespace BipedRobot
 
         private double _performanceIndexVal;
 
+        private Dictionary<string, FloatingPoint> _parameters;
+
         public SQP(BRVHC vhc)
         {
             
             Expression ddtheta = Expression.Symbol("ddtheta");
             Expression dthetaSquared = Expression.Symbol("dtheta^2");
             Expression theta = Expression.Symbol("theta");
+
+            _parameters = new Dictionary<string, FloatingPoint>();
+            _parameters.Add("theta", 0);
+            _parameters.Add("dtheta", 0);
+            _parameters.Add("ddtheta", 0);
+
+            foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi1Parameters)
+            {
+                _parameters.Add(entry.Key, entry.Value);
+            }
+            foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi2Parameters)
+            {
+                _parameters.Add(entry.Key, entry.Value);
+            }
+            foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi3Parameters)
+            {
+                _parameters.Add(entry.Key, entry.Value);
+            }
 
             StreamReader fs = null;
             fs = new StreamReader(@"../../../alpha1.txt");
@@ -1245,10 +1265,6 @@ namespace BipedRobot
                 Vector<double>.Build.Dense(new[] { gait.gaitParam.theta0, gait.gaitParam.dtheta0 }), 
                 Vector<double>.Build.Dense(new[] { gait.gaitParam.thetaT, gait.gaitParam.dthetaT }));
             double sum = 0;
-            Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
-            parameters.Add("theta", 0);
-            parameters.Add("dtheta", 0);
-            parameters.Add("ddtheta", 0);
             for (int i = 0; i < gait.data.RES.Count; i++)
             {
 
