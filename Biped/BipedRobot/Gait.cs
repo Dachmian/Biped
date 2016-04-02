@@ -348,6 +348,9 @@ namespace BipedRobot
         public BRVHC(BRParameters param, int numberOfPoints)
         {
             _parameters = new Dictionary<string, FloatingPoint>();
+            _phi1Parameters = new Dictionary<string, FloatingPoint>();
+            _phi2Parameters = new Dictionary<string, FloatingPoint>();
+            _phi3Parameters = new Dictionary<string, FloatingPoint>();
 
             StreamReader fs = null;
             fs = new StreamReader(@"../../../q3.txt");
@@ -443,6 +446,7 @@ namespace BipedRobot
             set
             {
                 _phi1Parameters = value;
+                _phi1Parameters.Add("theta", 0);
             }
         }
         public Dictionary<string, FloatingPoint> phi2Parameters
@@ -454,6 +458,7 @@ namespace BipedRobot
             set
             {
                 _phi2Parameters = value;
+                _phi2Parameters.Add("theta", 0);
             }
         }
         public Dictionary<string, FloatingPoint> phi3Parameters
@@ -465,6 +470,8 @@ namespace BipedRobot
             set
             {
                 _phi3Parameters = value;
+                _phi3Parameters.Add("theta", 0);
+
             }
         }
         #endregion
@@ -642,50 +649,50 @@ namespace BipedRobot
 
         public double evalPhi1(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi1).RealValue;
+            _phi1Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi1Parameters, _phi1).RealValue;
         }
         public double evalPhi2(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi2).RealValue;
+            _phi2Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi2Parameters, _phi2).RealValue;
         }
         public double evalPhi3(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _phi3).RealValue;
+            _phi3Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi3Parameters, _phi3).RealValue;
         }
 
         public double evalDphi1(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi1).RealValue;
+            _phi1Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi1Parameters, _dphi1).RealValue;
         }
         public double evalDphi2(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi2).RealValue;
+            _phi2Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi2Parameters, _dphi2).RealValue;
         }
         public double evalDphi3(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _dphi3).RealValue;
+            _phi3Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi3Parameters, _dphi3).RealValue;
         }
 
         public double evalDdphi1(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi1).RealValue;
+            _phi1Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi1Parameters, _ddphi1).RealValue;
         }
         public double evalDdphi2(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi2).RealValue;
+            _phi2Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi2Parameters, _ddphi2).RealValue;
         }
         public double evalDdphi3(double theta)
         {
-            _parameters["theta"] = theta;
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _ddphi3).RealValue;
+            _phi3Parameters["theta"] = theta;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_phi3Parameters, _ddphi3).RealValue;
         }
 
         public Expression phi1
