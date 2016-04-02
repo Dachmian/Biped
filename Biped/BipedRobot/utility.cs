@@ -204,14 +204,25 @@ namespace BipedRobot{
     {
         
 
-        public static void run(BRVHC vhc)
+        public static BRReducedData run(BRVHC vhc, Vector<double> integrationStart, Vector<double> integrationEnd)
         {
-            
+            BRReducedData data = new BRReducedData(0.01, integrationStart);
+            int i = 0;
+            Vector<double> oneStep = integrationStart;
+			while (true){
+				oneStep = rk4 (oneStep, data.timestep, vhc);
+                double ddtheta = BRReducedDynamics.rhs1D(oneStep, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+				data.RES [i+1] = new Tuple<Vector<double>,double> (Vector<double>.Build.Dense(new []{oneStep[0], oneStep[1], ddtheta}), i*data.timestep);
+				if (oneStep[0] > integrationEnd[0]) {
+					break;
+				}
+                i++;
+            }
+            return data;
         }
 
-        public static Vector<double> rk4(Vector<double> THETA, BRVHC vhc)
+        public static Vector<double> rk4(Vector<double> THETA, double dx, BRVHC vhc)
         {
-            double dx = 0.01;
             double halfdx = 0.5 * dx;
             double sixth = 1.0 / 6.0;
 

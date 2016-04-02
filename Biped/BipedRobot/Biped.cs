@@ -575,10 +575,17 @@ namespace BipedRobot
 
     public class BRReducedData
     {
-        private Tuple<Vector<double>, double>[] _RES;
+        private List<Tuple<Vector<double>, double>> _RES;
         private double _timestep;
 
-        public Tuple<Vector<double>, double>[] RES
+        public BRReducedData(double timestep, Vector<double> start)
+        {
+            _RES = new List<Tuple<Vector<double>, double>>();
+            _RES.Add(new Tuple<Vector<double>,double>(start,0));
+            _timestep = timestep;
+        }
+
+        public List<Tuple<Vector<double>, double>> RES
         {
             get
             {

@@ -17,8 +17,13 @@ namespace BipedRobot
     {
         private Tuple<Vector<double>, Vector<double>, Vector<double>> _gaitParameters;
         private double _objFunVal;
-        private double _intervalStart;
-        private double _intervalEnd;
+        private double _startAngle;
+        private double _endAngle;
+        private double _theta0;
+        private double _thetaT;
+        private double _dtheta0;
+        private double _dthetaT;
+
         private Vector<double> _initialControlPointsq1;
         private Vector<double> _initialControlPointsq2;
         private Vector<double> _initialControlPointsq3;
@@ -48,15 +53,16 @@ namespace BipedRobot
             _initialControlPointsq3 = Vector<double>.Build.Dense(numOfPoints);
             setPosture();
             setInitialControlPoints(numOfPoints);
+            setInitialTheta();
         }
 
         public void setInitialControlPoints(int numOfPoints)
         {
-            _initialControlPointsq1[0] = _intervalStart;
-            _initialControlPointsq1[1] = _intervalStart/2;
+            _initialControlPointsq1[0] = _startAngle;
+            _initialControlPointsq1[1] = _startAngle / 2;
             _initialControlPointsq1[2] = 0;
-            _initialControlPointsq1[3] = _intervalEnd/2;
-            _initialControlPointsq1[4] = _intervalEnd;
+            _initialControlPointsq1[3] = _endAngle / 2;
+            _initialControlPointsq1[4] = _endAngle;
 
 
             _initialControlPointsq2[0] = 0;
@@ -66,16 +72,21 @@ namespace BipedRobot
             _initialControlPointsq2[4] = 0;
 
 
-            _initialControlPointsq3[0] = _intervalEnd;
-            _initialControlPointsq3[1] = _intervalEnd / 2;
+            _initialControlPointsq3[0] = _endAngle;
+            _initialControlPointsq3[1] = _endAngle / 2;
             _initialControlPointsq3[2] = 0;
-            _initialControlPointsq3[3] = _intervalStart/2;
-            _initialControlPointsq3[4] = _intervalStart;
+            _initialControlPointsq3[3] = _startAngle / 2;
+            _initialControlPointsq3[4] = _startAngle;
         }
         public void setPosture()
         {
-            _intervalStart = -Math.PI / 8;
-            _intervalEnd = Math.PI / 8;
+            _startAngle = -Math.PI / 8;
+            _endAngle = Math.PI / 8;
+        }
+        public void setInitialTheta()
+        {
+            _theta0 = 0;
+            _thetaT = 1;
         }
 
         public Tuple<Vector<double>, Vector<double>, Vector<double>> gaitparameters
@@ -100,26 +111,70 @@ namespace BipedRobot
                 _objFunVal = value;
             }
         }
-        public double intervalStart
+        public double startAngle
         {
             get
             {
-                return _intervalStart;
+                return _startAngle;
             }
             set
             {
-                _intervalStart = value;
+                _startAngle = value;
             }
         }
-        public double intervalEnd
+        public double endAngle
         {
             get
             {
-                return _intervalEnd;
+                return _endAngle;
             }
             set
             {
-                _intervalEnd = value;
+                _endAngle = value;
+            }
+        }
+        public double theta0
+        {
+            get
+            {
+                return _theta0;
+            }
+            set
+            {
+                _theta0 = value;
+            }
+        }
+        public double thetaT
+        {
+            get
+            {
+                return _thetaT;
+            }
+            set
+            {
+                _thetaT = value;
+            }
+        }
+        public double dtheta0
+        {
+            get
+            {
+                return _dtheta0;
+            }
+            set
+            {
+                _dtheta0 = value;
+            }
+        }
+        public double dthetaT
+        {
+            get
+            {
+                return _dthetaT;
+            }
+            set
+            {
+                _dthetaT = value;
             }
         }
         public Vector<double> initialControlPointsq1
@@ -168,7 +223,7 @@ namespace BipedRobot
             {
                 setParametersRandom(ref gait);
                 setVHC(ref gait, numberOfPoints);
-                if (verifyParameters(gait) && verifyImpact(gait))
+                if (setAndVerifyParameters(ref gait) && verifyImpact(gait))
                 {
                     Console.WriteLine("found gait");
                     Console.WriteLine(i);
@@ -181,7 +236,7 @@ namespace BipedRobot
             }
             //begin search
             SQP sqp = new SQP(gait.vhc);
-
+            sqp.run(gait);
 
 
 
@@ -194,9 +249,9 @@ namespace BipedRobot
                 fs.WriteLine(Infix.Format(g.vhc.phi1));
                 fs.WriteLine(Infix.Format(g.vhc.phi1));
                 fs.WriteLine(Infix.Format(g.vhc.phi1));
-                fs.WriteLine(g.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
-                fs.WriteLine(g.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
-                fs.WriteLine(g.impactThirdLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                fs.WriteLine(g.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+                fs.WriteLine(g.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+                fs.WriteLine(g.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
                 fs.WriteLine();
             }
             fs.Close();
@@ -246,32 +301,34 @@ namespace BipedRobot
             gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
             gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
         }
-        public static bool verifyParameters(BRgait gait)
+        public static bool setAndVerifyParameters(ref BRgait gait)
         {
-            double thetaDotAtTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 32)) /
-                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd, 32)) 
-                * Math.Pow(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd), 2));
+            double dthetaTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.theta0, gait.gaitParam.thetaT, 32)) /
+                (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.theta0, gait.gaitParam.thetaT, 32))
+                * Math.Pow(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT), 2));
             //Console.WriteLine(thetaDotAtTSquare);
-            if (thetaDotAtTSquare < 0.1 || thetaDotAtTSquare > 10000 || thetaDotAtTSquare == double.NaN)
+            if (dthetaTSquare < 0.1 || dthetaTSquare > 10000 || dthetaTSquare == double.NaN)
             {
                 return false;
             }
             else
             {
+                gait.gaitParam.dthetaT = Math.Sqrt(dthetaTSquare);
+                gait.gaitParam.dtheta0 = gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT) * Math.Sqrt(dthetaTSquare);
                 return true;
             }
         }
         public static bool verifyImpact(BRgait gait)
         {
-            double firstAndSecond = gait.impactFirstLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd) - 
-                gait.impactSecondLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd); 
-            double firstAndThird = gait.impactFirstLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd) - 
-                gait.impactThirdLine(gait.gaitParam.intervalStart,gait.gaitParam.intervalEnd);
+            double firstAndSecond = gait.impactFirstLine(0,1) - 
+                gait.impactSecondLine(0,1); 
+            double firstAndThird = gait.impactFirstLine(0,1) - 
+                gait.impactThirdLine(0,1);
             if ((firstAndSecond <= 0.001 && firstAndSecond >= -0.001) && (firstAndThird <= 0.001 && firstAndThird >= -0.001)) 
             {
-                Console.WriteLine(gait.impactFirstLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
-                Console.WriteLine(gait.impactSecondLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
-                Console.WriteLine(gait.impactThirdLine(gait.gaitParam.intervalStart, gait.gaitParam.intervalEnd));
+                Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+                Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+                Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
                 return true;
             }
             return false;
@@ -1025,6 +1082,7 @@ namespace BipedRobot
     {
         private BRVHC _vhc;
         private BRGaitParameters _gaitParam;
+        private BRReducedData _data;
 
         public BRgait(BRParameters param, int numberOfPoints)
         {
@@ -1053,6 +1111,17 @@ namespace BipedRobot
                 _gaitParam = value;
             }
         }
+        public BRReducedData data
+        {
+            get
+            {
+                return _data;
+            }
+            set
+            {
+                _data = value;
+            }
+        }
 
         public double firstIntegral(double theta)
         {
@@ -1062,7 +1131,7 @@ namespace BipedRobot
 
         public double secondIntegral(double theta)
         {
-            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, _gaitParam.intervalStart, theta, 32);
+            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, 0, theta, 32);
             return Math.Exp(a) * _vhc.evalTwoTimesGammaDividedByAlpha(theta);
         }
 
@@ -1090,6 +1159,8 @@ namespace BipedRobot
         private Expression _ineqConstraint2;
         private Expression _eqConstraint1;
         private Expression _eqConstraint2;
+
+        private double _performanceIndexVal;
 
         public SQP(BRVHC vhc)
         {
@@ -1146,21 +1217,36 @@ namespace BipedRobot
 
             _ineqConstraint2 = alpha3 * ddtheta + beta3 * dthetaSquared + gamma3 -150;
 
-            _performanceIndex = (alpha1 * ddtheta + beta1 * dthetaSquared + gamma1) * vhc.dphi1 + (alpha3 * ddtheta + beta3 * dthetaSquared + gamma3) * vhc.dphi3;
+            _performanceIndex = Expression.Abs((alpha1 * ddtheta + beta1 * dthetaSquared + gamma1) * vhc.dphi1 + (alpha3 * ddtheta + beta3 * dthetaSquared + gamma3) * vhc.dphi3);
 
             _eqConstraint1 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegSecondLine/vhc.impactPosSecondLine;
             _eqConstraint2 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegThirdLine / vhc.impactPosThirdLine;
         }
 
 
-        public double EvalPerformanceIndex()
+        public double EvalPerformanceIndex(ref BRgait gait)
         {
+            gait.data = integrationReducedDynamics.run(gait.vhc, 
+                Vector<double>.Build.Dense(new[] { gait.gaitParam.theta0, gait.gaitParam.dtheta0 }), 
+                Vector<double>.Build.Dense(new[] { gait.gaitParam.thetaT, gait.gaitParam.dthetaT }));
+            double sum = 0;
+            Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
+            parameters.Add("theta", 0);
+            parameters.Add("dtheta", 0);
+            parameters.Add("ddtheta", 0);
+            for (int i = 0; i < gait.data.RES.Count; i++)
+            {
+
+            }
             return 0;
         }
 
-        public void run()
+        public void run(BRgait gait)
         {
-            
+
+            _performanceIndexVal = EvalPerformanceIndex(ref gait);
+
+
         }
 
 
