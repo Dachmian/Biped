@@ -10,6 +10,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics;
 using System.Globalization;
+using MathNet.Symbolics;
 
 namespace BipedRobot
 {
@@ -67,47 +68,47 @@ namespace BipedRobot
             return r;
         }
 
-        public Tuple<Dictionary<string,double>,string> phi1ToString()
+        public Tuple<Dictionary<string,FloatingPoint>,string> phi1ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
-            Dictionary<string, double> parameters = new Dictionary<string, double>();
+            Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
                 str += "P"+i.ToString()+" * " + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
-                parameters.Add("P" + i.ToString(), valueVector[i]);
+                parameters.Add("P" + i.ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return new Tuple<Dictionary<string, double>, string>(parameters, str);
+            return new Tuple<Dictionary<string, FloatingPoint>, string>(parameters, str);
         }
-        public Tuple<Dictionary<string, double>, string> phi2ToString()
+        public Tuple<Dictionary<string, FloatingPoint>, string> phi2ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
-            Dictionary<string, double> parameters = new Dictionary<string, double>();
+            Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
                 str += "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
-                parameters.Add("P" + (i + _numControlPoints).ToString(), valueVector[i]);
+                parameters.Add("P" + (i + _numControlPoints).ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return new Tuple<Dictionary<string, double>, string>(parameters, str);
+            return new Tuple<Dictionary<string, FloatingPoint>, string>(parameters, str);
         }
-        public Tuple<Dictionary<string, double>, string> phi3ToString()
+        public Tuple<Dictionary<string, FloatingPoint>, string> phi3ToString()
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
-            Dictionary<string, double> parameters = new Dictionary<string, double>();
+            Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
                 str += "P" + (i + 2*_numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
-                parameters.Add("P" + (i + 2*_numControlPoints).ToString(), valueVector[i]);
+                parameters.Add("P" + (i + 2*_numControlPoints).ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
             str = str.Replace("+-", "-");
-            return new Tuple<Dictionary<string, double>, string>(parameters, str);
+            return new Tuple<Dictionary<string, FloatingPoint>, string>(parameters, str);
         }
 
         public string dphi1ToString()

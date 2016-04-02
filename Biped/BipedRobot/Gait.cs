@@ -288,10 +288,18 @@ namespace BipedRobot
         public static void setVHC(ref BRgait gait, int numberOfPoints)
         {
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            Tuple<Dictionary<string, double>, string> tuple = new Tuple<Dictionary<string, double>, string>();
-            gait.vhc.phi1 = Infix.ParseOrUndefined(brCrv.phi1ToString());
-            gait.vhc.phi2 = Infix.ParseOrUndefined(brCrv.phi2ToString());
-            gait.vhc.phi3 = Infix.ParseOrUndefined(brCrv.phi3ToString());
+
+            Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
+            gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
+            gait.vhc.phi1Parameters = tuple.Item1;
+
+            tuple = brCrv.phi2ToString();
+            gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
+            gait.vhc.phi2Parameters = tuple.Item1;
+
+            tuple = brCrv.phi3ToString();
+            gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
+            gait.vhc.phi3Parameters = tuple.Item1;
 
             gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
             gait.vhc.dphi2 = Infix.ParseOrUndefined(brCrv.dphi2ToString());
