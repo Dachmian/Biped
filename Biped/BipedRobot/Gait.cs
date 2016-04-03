@@ -1146,8 +1146,12 @@ namespace BipedRobot
 
         public double secondIntegral(double theta)
         {
-            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, 0, theta, 32);
+            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, 0, theta, 64);
             return Math.Exp(a) * _vhc.evalTwoTimesGammaDividedByAlpha(theta);
+        }
+        public double secondIntegralPartial(double theta)
+        {
+            return _vhc.evalTwoTimesGammaDividedByAlpha(theta);
         }
 
         public double impactFirstLine(double thetaStart, double thetaEnd)

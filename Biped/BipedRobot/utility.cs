@@ -107,7 +107,6 @@ namespace BipedRobot{
 			biped.data.currentQ = Vector<double>.Build.Dense (new double[] {initialConditions[0],initialConditions[1],initialConditions[2] });
 			biped.data.currentDQ = Vector<double>.Build.Dense (new double[] {initialConditions[3],initialConditions[4],initialConditions[5] });
 		}
-
 		public static double stoppingConditionREL(Vector<double> currentState)
 		{
 			double q1 = currentState [0];
@@ -116,7 +115,6 @@ namespace BipedRobot{
 			double val = (Math.Sin (q1) + Math.Sin (q1 + q2 + q3));
 			return val;
 		}
-
         public static double stoppingConditionABS(Vector<double> currentState)
         {
             double q1 = currentState[0];
@@ -126,7 +124,6 @@ namespace BipedRobot{
             Console.WriteLine(val);
             return val;
         }
-
         public static void integrateUntilConditionGEO(ref Biped biped)
 		{
 			if (stoppingConditionABS (biped.data.currentQ) < 0) {
@@ -233,6 +230,33 @@ namespace BipedRobot{
             Vector<double> k4 = dx * BRReducedDynamics.rhs2D(THETA + k3 * dx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
 
             return + sixth * (k1 + 2 * k2 + 2 * k3 + k4);
+        }
+    }
+
+    public static class calculateReducedDynamics
+    {
+        public static double[,] run(BRgait gait)
+        {
+            GaussianQuadrature quad = new GaussianQuadrature();
+            double[,] firstIntegral = quad.run(gait, gait.firstIntegral);
+            double[,] secondIntegral = quad.run(gait, gait.secondIntegral);
+            double[,] THETA = new double[firstIntegral.Length, 3];
+            THETA[0, 0] = 0;
+            THETA[0, 1] = 1;
+            double sumFirstIntegral = 0;
+            double sumSecondIntegral = 0;
+            double dtheta0 = gait.gaitParam.dtheta0;
+            double dtheta;
+            for (int i = 1; i < firstIntegral.Length; i++)
+            {
+                sumFirstIntegral += firstIntegral[i,1];
+                sumSecondIntegral += secondIntegral[i,1];
+                dtheta = Math.Sqrt(Math.Exp(sumFirstIntegral)) * Math.Pow(dtheta0, 2) + sumSecondIntegral;
+                THETA[i, 0] = firstIntegral[i, 0];
+                THETA[i, 1] = dtheta;
+                THETA[i, 2] = BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new[] { THETA[i, 0], dtheta }), gait.vhc.evalAlpha, gait.vhc.evalBeta, gait.vhc.evalGamma);
+            }
+            return THETA;
         }
     }
 

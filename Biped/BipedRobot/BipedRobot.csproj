@@ -71,6 +71,7 @@
     <Compile Include="BezierCurve.cs" />
     <Compile Include="Biped.cs" />
     <Compile Include="Gait.cs" />
+    <Compile Include="GaussianQuadrature.cs" />
     <Compile Include="graph.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -106,14 +106,7 @@ namespace BipedRobot
 
         public double EvalPerformanceIndex(ref BRgait gait)
         {
-            gait.data = integrationReducedDynamics.run(gait.vhc,
-                Vector<double>.Build.Dense(new[] { gait.gaitParam.theta0, gait.gaitParam.dtheta0 }),
-                Vector<double>.Build.Dense(new[] { gait.gaitParam.thetaT, gait.gaitParam.dthetaT }));
-            double sum = 0;
-            for (int i = 0; i < gait.data.RES.Count; i++)
-            {
-
-            }
+            double[,] THETA = calculateReducedDynamics.run(gait);
             return 0;
         }
 
@@ -124,7 +117,7 @@ namespace BipedRobot
 
 
         }
-
+        
 
     }
 }
