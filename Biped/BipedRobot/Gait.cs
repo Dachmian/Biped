@@ -235,8 +235,8 @@ namespace BipedRobot
                 }
             }
             //begin search
-            SQP sqp = new SQP(gait.vhc);
-            sqp.run(gait);
+            SQPPower sqpPower = new SQPPower(gait.vhc);
+            sqpPower.run(gait);
 
 
 

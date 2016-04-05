@@ -12,7 +12,7 @@ namespace BipedRobot
 {
 
     //the performanceindex is to be integrated from theta0 to thetaT 
-    public class SQP
+    public class SQPPower
     {
         private Expression _performanceIndex;
         private Expression _ineqConstraint1;
@@ -29,7 +29,7 @@ namespace BipedRobot
 
         public delegate double func(Expression exp);
 
-        public SQP(BRVHC vhc)
+        public SQPPower(BRVHC vhc)
         {
 
             Expression ddtheta = Expression.Symbol("ddtheta");
@@ -159,6 +159,18 @@ namespace BipedRobot
         {
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, exp).RealValue;
         }
+
+    }
+
+
+
+    public class SQPImpact
+    {
+
+    }
+
+    public class QPActiveSet
+    {
 
     }
 }
