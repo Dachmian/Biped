@@ -12,7 +12,7 @@ namespace BipedRobot
 {
 
     //the performanceindex is to be integrated from theta0 to thetaT 
-    public class SQPImpact
+    public class AGSImpact
     {
         private Expression _performanceIndex;
         private Expression _ineqConstraint1;
@@ -39,7 +39,7 @@ namespace BipedRobot
 
         public delegate double func(Expression exp);
 
-        public SQPImpact(BRVHC vhc)
+        public AGSImpact(BRVHC vhc)
         {
 
             Expression ddtheta = Expression.Symbol("ddtheta");

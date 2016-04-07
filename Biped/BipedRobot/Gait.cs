@@ -219,24 +219,10 @@ namespace BipedRobot
             //first time running use rand to find a valid gait
             int numberOfPoints = 5;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
-            for (int i = 0; i < 200000; i++)
-            {
-                setParametersRandom(ref gait);
-                setVHC(ref gait, numberOfPoints);
-                if (setAndVerifyParameters(ref gait) && verifyImpact(gait))
-                {
-                    Console.WriteLine("found gait");
-                    Console.WriteLine(i);
-                    Infix.Format(gait.vhc.phi1);
-                    Infix.Format(gait.vhc.phi2);
-                    Infix.Format(gait.vhc.phi3);
-                    biped.gaits.Add(gait);
-                    break;
-                }
-            }
+            setVHC(ref gait, numberOfPoints);
             //begin search
-            SQPImpact sqpImpact = new SQPImpact(gait.vhc);
-            sqpImpact.run(gait);
+            AGSImpact agsImpact = new AGSImpact(gait.vhc);
+            agsImpact.run(gait);
 
 
 
