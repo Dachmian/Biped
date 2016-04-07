@@ -39,14 +39,8 @@ namespace BipedRobot
             int tempint = Int32.Parse(temp);
             fs.Close();
             */
-            Vector<double> q1 = Vector<double>.Build.Dense(numOfPoints);
-
-            Vector<double> q2 = Vector<double>.Build.Dense(numOfPoints);
-
-            Vector<double> q3 = Vector<double>.Build.Dense(numOfPoints);
             
-            _gaitParameters = new Tuple<Vector<double>, Vector<double>, Vector<double>>(
-                q1, q2, q3);
+            
 
             _initialControlPointsq1 = Vector<double>.Build.Dense(numOfPoints);
             _initialControlPointsq2 = Vector<double>.Build.Dense(numOfPoints);
@@ -54,6 +48,9 @@ namespace BipedRobot
             setPosture();
             setInitialControlPoints(numOfPoints);
             setInitialTheta();
+
+            _gaitParameters = new Tuple<Vector<double>, Vector<double>, Vector<double>>(
+                _initialControlPointsq1, _initialControlPointsq2, _initialControlPointsq3);
         }
 
         public void setInitialControlPoints(int numOfPoints)

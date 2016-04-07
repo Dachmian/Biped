@@ -61,3 +61,4 @@ C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobo
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\FSharp.Core.xml
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Numerics.FSharp.xml
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\MathNet.Symbolics.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\alglibnet2.dll
