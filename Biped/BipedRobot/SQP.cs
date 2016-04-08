@@ -233,7 +233,7 @@ namespace BipedRobot
             alglib.minnssetalgoags(state, radius, rho);
             alglib.minnssetcond(state, epsx, maxits);
             alglib.minnssetscale(state, s);
-
+            
             alglib.minnssetnlc(state, 5, 3);
 
             alglib.minnsoptimize(state, evaluateObjFuncAndConstraints, null, null);

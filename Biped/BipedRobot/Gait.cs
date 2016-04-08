@@ -306,7 +306,7 @@ namespace BipedRobot
             double dthetaTSquare = (-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.secondIntegral, gait.gaitParam.theta0, gait.gaitParam.thetaT, 32)) /
                 (1 - Math.Exp(-MathNet.Numerics.Integration.GaussLegendreRule.Integrate(gait.firstIntegral, gait.gaitParam.theta0, gait.gaitParam.thetaT, 32))
                 * Math.Pow(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT), 2));
-            //Console.WriteLine(thetaDotAtTSquare);
+            Console.WriteLine(dthetaTSquare);
             if (dthetaTSquare < 0.1 || dthetaTSquare > 10000 || dthetaTSquare == double.NaN)
             {
                 return false;
