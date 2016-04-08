@@ -18,12 +18,18 @@ namespace BipedRobot
         private Expression _eqConstraint1;
         private Expression _eqConstraint2;
         private Expression _eqConstraint3;
+        private Expression _ineqConstraint1;
+        private Expression _ineqConstraint2;
+        private Expression _ineqConstraint3;
         private Expression _lagrangian;
         private Expression[] _performanceGradientArray;
         private Expression[,] _hessianMatrix;
         private Expression[] _eqconstraint1GradientArray;
         private Expression[] _eqconstraint2GradientArray;
         private Expression[] _eqconstraint3GradientArray;
+        private Expression[] _ineqconstraint1GradientArray;
+        private Expression[] _ineqconstraint2GradientArray;
+        private Expression[] _ineqconstraint3GradientArray;
 
         private double[] _eqconstraint1Gradient;
         private double[] _eqconstraint2Gradient;
@@ -132,7 +138,7 @@ namespace BipedRobot
             impactNegThirdLine = Structure.Substitute("dphi3", vhc.dphi3, impactNegThirdLine);
             impactNegThirdLine = Structure.Substitute("theta", "1", impactNegThirdLine);
 
-            _performanceIndex = Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegSecondLine / impactPosSecondLine,"2") - Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegThirdLine / impactPosThirdLine,"2");
+            _performanceIndex = Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegSecondLine / impactPosSecondLine,"2") + Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegThirdLine / impactPosThirdLine,"2");
 
             Expression phi1Start = vhc.phi1;
             phi1Start = Structure.Substitute("theta", "0", phi1Start);
@@ -149,9 +155,13 @@ namespace BipedRobot
             Expression phi3End = vhc.phi3;
             phi3End = Structure.Substitute("theta", "1", phi3End);
 
-            _eqConstraint1 = phi1End;
-            _eqConstraint2 = phi2End;
-            _eqConstraint3 = phi3End;
+            _eqConstraint1 = phi1End + phi1Start;
+            _eqConstraint2 = phi2End - phi2Start;
+            _eqConstraint3 = phi3End + phi3Start;
+
+            _ineqConstraint1 = -(impactNegFirstLine / impactPosFirstLine);
+            _ineqConstraint2 = -(impactNegSecondLine / impactPosSecondLine);
+            _ineqConstraint3 = -(impactNegThirdLine / impactPosThirdLine);
 
             _lagrangian = _performanceIndex - "delta1" * _eqConstraint1 - "delta2" * _eqConstraint2 - "delta3" * _eqConstraint3;
 
@@ -161,6 +171,10 @@ namespace BipedRobot
             _eqconstraint1GradientArray = new Expression[len * 3];
             _eqconstraint2GradientArray = new Expression[len * 3];
             _eqconstraint3GradientArray = new Expression[len * 3];
+
+            _ineqconstraint1GradientArray = new Expression[len * 3];
+            _ineqconstraint2GradientArray = new Expression[len * 3];
+            _ineqconstraint3GradientArray = new Expression[len * 3];
             for (int i = 0; i < _performanceGradientArray.Length; i++)
             {
                 _performanceGradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _performanceIndex);
@@ -168,6 +182,10 @@ namespace BipedRobot
                 _eqconstraint1GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint1);
                 _eqconstraint2GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint2);
                 _eqconstraint3GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint3);
+
+                _ineqconstraint1GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint1);
+                _ineqconstraint2GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint2);
+                _ineqconstraint3GradientArray[i] = Calculus.Differentiate("P" + i.ToString(), _eqConstraint3);
 
                 Expression expTemp = Calculus.Differentiate("P" + i.ToString(), _lagrangian);
                 for (int j = 0; j < _performanceGradientArray.Length; j++)
@@ -190,7 +208,7 @@ namespace BipedRobot
 
             double[] p0 = _parameterValues;
             double[] s = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-            double epsx = 0.00001;
+            double epsx = 0.0001;
             double radius = 0.1;
             double rho = 50.0;
             int maxits = 0;
@@ -203,7 +221,7 @@ namespace BipedRobot
             alglib.minnssetcond(state, epsx, maxits);
             alglib.minnssetscale(state, s);
 
-            alglib.minnssetnlc(state, 3, 0);
+            alglib.minnssetnlc(state, 3, 3);
 
             alglib.minnsoptimize(state, evaluateObjFuncAndConstraints, null, null);
             alglib.minnsresults(state, out p1, out rep);
@@ -233,6 +251,22 @@ namespace BipedRobot
 
         public void evaluateObjFuncAndConstraints(double[] p, double[] objFunction, double[,] jacobian, object obj)
         {
+            _parameters["P0"] = p[0];
+            _parameters["P1"] = p[1];
+            _parameters["P2"] = p[2];
+            _parameters["P3"] = p[3];
+            _parameters["P4"] = p[4];
+            _parameters["P5"] = p[5];
+            _parameters["P6"] = p[6];
+            _parameters["P7"] = p[7];
+            _parameters["P8"] = p[8];
+            _parameters["P9"] = p[9];
+            _parameters["P10"] = p[10];
+            _parameters["P11"] = p[11];
+            _parameters["P12"] = p[12];
+            _parameters["P13"] = p[13];
+            _parameters["P14"] = p[14];
+
             int len = p.Length;
             for (int i = 0; i < len; i++)
             {
@@ -242,11 +276,17 @@ namespace BipedRobot
                 jacobian[1, i] = evaluateFunction(_eqconstraint1GradientArray[i]);
                 jacobian[2, i] = evaluateFunction(_eqconstraint2GradientArray[i]);
                 jacobian[3, i] = evaluateFunction(_eqconstraint3GradientArray[i]);
+                jacobian[4, i] = evaluateFunction(_ineqconstraint1GradientArray[i]);
+                jacobian[5, i] = evaluateFunction(_ineqconstraint2GradientArray[i]);
+                jacobian[6, i] = evaluateFunction(_ineqconstraint3GradientArray[i]);
             }
             objFunction[0] = evaluateFunction(_performanceIndex);
             objFunction[1] = evaluateFunction(_eqConstraint1);
             objFunction[2] = evaluateFunction(_eqConstraint2);
             objFunction[3] = evaluateFunction(_eqConstraint3);
+            objFunction[4] = evaluateFunction(_ineqConstraint1);
+            objFunction[5] = evaluateFunction(_ineqConstraint2);
+            objFunction[6] = evaluateFunction(_ineqConstraint3);
         }
 
         
