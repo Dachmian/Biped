@@ -63,35 +63,38 @@ namespace BipedRobot{
         static void test2(Biped biped)
         {
             
-            int numberOfPoints = 5;
+            int numberOfPoints = 6;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            
+            //{0.146155955657700,0.131950378278521,0.146155955657700,0.131950378278521,0.146155955657700,-0.351186852776185,3.108861092790050,1.484243139380400,-4.126755127401950,-6.776195404447800,6.309842438987150,13.793249658094000,0.408525121245220,0.087820862782903,-0.232981079597844,-0.553883349000211,-0.411839675470575,0.351188188376620}
             Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
             gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P0"] = -0.397706480340997;
-            tuple.Item1["P1"] = -1.832099220573480;
-            tuple.Item1["P2"] = -1.772153266286530;
-            tuple.Item1["P3"] = 0.131396187920137;
-            tuple.Item1["P4"] = 1.935281527481110;
+            tuple.Item1["P0"] = -0.194185285741060;
+            tuple.Item1["P1"] = -0.151094188997982;
+            tuple.Item1["P2"] = -0.194185285741060;
+            tuple.Item1["P3"] = -0.151094188997982;
+            tuple.Item1["P4"] = -0.194185285741060;
+            tuple.Item1["P5"] = 0.442367201998693;
             gait.vhc.phi1Parameters = tuple.Item1;
 
             tuple = brCrv.phi2ToString();
             gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P5"] = -1.007680385447250;
-            tuple.Item1["P6"] = 0.166771260567510;
-            tuple.Item1["P7"] = 4.708400907030840;
-            tuple.Item1["P8"] = -3.867479905112620;
-            tuple.Item1["P9"] = 0.940408914676057;
+            tuple.Item1["P6"] = 2.071227885629750;
+            tuple.Item1["P7"] = -0.066709291992360;
+            tuple.Item1["P8"] = -1.359269942376010;
+            tuple.Item1["P9"] = -4.333158819178490;
+            tuple.Item1["P10"] = 3.687924794089680;
+            tuple.Item1["P11"] = 1.080453088934920;
             gait.vhc.phi2Parameters = tuple.Item1;
-            //{0.348867076182787,1.734452411850560,1.745040104384210,0.323596856033392,-2.075955418952420}
+            
             tuple = brCrv.phi3ToString();
             gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P10"] = 0.348867076182787;
-            tuple.Item1["P11"] = 1.734452411850560;
-            tuple.Item1["P12"] = 1.745040104384210;
-            tuple.Item1["P13"] = 0.323596856033392;
-            tuple.Item1["P14"] = -2.075955418952420;
+            tuple.Item1["P12"] = -0.237107808954207;
+            tuple.Item1["P13"] = -0.331506856495824;
+            tuple.Item1["P14"] = -0.425847308729971;
+            tuple.Item1["P15"] = -0.520074509042658;
+            tuple.Item1["P16"] = -0.807698873828162;
+            tuple.Item1["P17"] = 1.161103768104110;
             gait.vhc.phi3Parameters = tuple.Item1;
 
             gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
@@ -104,6 +107,11 @@ namespace BipedRobot{
             Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+
+
+            Console.WriteLine(Infix.Format(gait.vhc.phi1));
+            Console.WriteLine(Infix.Format(gait.vhc.phi2));
+            Console.WriteLine(Infix.Format(gait.vhc.phi3));
         }
     }
 }

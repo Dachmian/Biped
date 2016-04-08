@@ -57,28 +57,31 @@ namespace BipedRobot
         {
             _initialControlPointsq1[0] = _startAngle;
             _initialControlPointsq1[1] = _startAngle / 2;
-            _initialControlPointsq1[2] = 0;
-            _initialControlPointsq1[3] = _endAngle / 2;
-            _initialControlPointsq1[4] = _endAngle;
+            _initialControlPointsq1[2] = _startAngle / 4;
+            _initialControlPointsq1[3] = _endAngle / 4;
+            _initialControlPointsq1[4] = _endAngle / 2;
+            _initialControlPointsq1[5] = _endAngle;
 
 
-            _initialControlPointsq2[0] = 0;
-            _initialControlPointsq2[1] = Math.PI/18;
-            _initialControlPointsq2[2] = 0;
-            _initialControlPointsq2[3] = -Math.PI/18;
+            _initialControlPointsq2[0] = Math.PI / 10;
+            _initialControlPointsq2[1] = 0;
+            _initialControlPointsq2[2] = -Math.PI / 10;
+            _initialControlPointsq2[3] = -Math.PI / 10;
             _initialControlPointsq2[4] = 0;
+            _initialControlPointsq2[5] = Math.PI / 10;
 
 
             _initialControlPointsq3[0] = _endAngle;
             _initialControlPointsq3[1] = _endAngle / 2;
             _initialControlPointsq3[2] = 0;
-            _initialControlPointsq3[3] = _startAngle / 2;
-            _initialControlPointsq3[4] = _startAngle;
+            _initialControlPointsq3[3] = 0;
+            _initialControlPointsq3[4] = _startAngle / 2;
+            _initialControlPointsq3[5] = _startAngle;
         }
         public void setPosture()
         {
-            _startAngle = -Math.PI / 8;
-            _endAngle = Math.PI / 8;
+            _startAngle = -Math.PI / 10;
+            _endAngle = Math.PI / 10;
         }
         public void setInitialTheta()
         {
@@ -214,8 +217,13 @@ namespace BipedRobot
         public static void run(ref Biped biped)
         {
             //first time running use rand to find a valid gait
-            int numberOfPoints = 5;
+            int numberOfPoints = 6;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
+            /*while (testImpact(gait))
+            {
+                setParametersRandom(ref gait);
+            }*/
+            Console.WriteLine("ute av impact");
             setVHC(ref gait, numberOfPoints);
             //begin search
             AGSImpact agsImpact = new AGSImpact(gait.vhc);
@@ -238,8 +246,9 @@ namespace BipedRobot
                 fs.WriteLine();
             }
             fs.Close();
-            
+
         }
+        
         public static void setParametersRandom(ref BRgait gait)
         {
             Random rndm = new Random();
@@ -323,6 +332,57 @@ namespace BipedRobot
                 return true;
             }
             return false;
+        }
+
+        public static bool testImpact(BRgait gait)
+        {
+            int numberOfPoints = 6;
+            BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
+            Vector<double> first = gait.gaitParam.gaitparameters.Item1;
+            Vector<double> second = gait.gaitParam.gaitparameters.Item2;
+            Vector<double> third = gait.gaitParam.gaitparameters.Item3;
+            Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
+            gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
+            tuple.Item1["P0"] =first[0];
+            tuple.Item1["P1"] = first[1];
+            tuple.Item1["P2"] = first[2];
+            tuple.Item1["P3"] = first[3];
+            tuple.Item1["P4"] = first[4];
+            tuple.Item1["P5"] = first[5];
+            gait.vhc.phi1Parameters = tuple.Item1;
+
+            tuple = brCrv.phi2ToString();
+            gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
+            tuple.Item1["P6"] = second[0];
+            tuple.Item1["P7"] = second[1];
+            tuple.Item1["P8"] = second[2];
+            tuple.Item1["P9"] = second[3];
+            tuple.Item1["P10"] = second[4];
+            tuple.Item1["P11"] = second[5];
+            gait.vhc.phi2Parameters = tuple.Item1;
+
+            tuple = brCrv.phi3ToString();
+            gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
+            tuple.Item1["P12"] = third[0];
+            tuple.Item1["P13"] = third[1];
+            tuple.Item1["P14"] = third[2];
+            tuple.Item1["P15"] = third[3];
+            tuple.Item1["P16"] = third[4];
+            tuple.Item1["P17"] = third[5];
+            gait.vhc.phi3Parameters = tuple.Item1;
+
+            gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
+            gait.vhc.dphi2 = Infix.ParseOrUndefined(brCrv.dphi2ToString());
+            gait.vhc.dphi3 = Infix.ParseOrUndefined(brCrv.dphi3ToString());
+
+            gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
+            gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
+            gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
+            if( (gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT)>0) && (gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT)>0) && (gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT) > 0))
+            {
+                return false;
+            }
+            return true;
         }
     }
 
