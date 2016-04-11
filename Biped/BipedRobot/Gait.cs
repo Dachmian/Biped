@@ -226,8 +226,9 @@ namespace BipedRobot
             Console.WriteLine("ute av impact");
             setVHC(ref gait, numberOfPoints);
             //begin search
-            AGSImpact agsImpact = new AGSImpact(gait.vhc);
-            agsImpact.run(gait);
+            AGSImpact ags = new AGSImpact(gait.vhc);
+            //ags.runAnalytical(gait);
+            ags.runNumerical(gait);
 
 
 

@@ -212,7 +212,7 @@ namespace BipedRobot
 
         }
 
-        public void run(BRgait gait)
+        public void runAnalytical(BRgait gait)
         {
             string a = Infix.Format(_performanceIndex);
             string b = Infix.Format(_eqConstraint1);
@@ -236,13 +236,40 @@ namespace BipedRobot
             
             alglib.minnssetnlc(state, 5, 3);
 
-            alglib.minnsoptimize(state, evaluateObjFuncAndConstraints, null, null);
+            alglib.minnsoptimize(state, evaluateObjFuncAndConstraintsAnalytical, null, null);
             alglib.minnsresults(state, out p1, out rep);
             Console.WriteLine("{0}", alglib.ap.format(p1, 15));
             
             Console.ReadLine();
             testImpact(gait, p1);
 
+        }
+        public void runNumerical(BRgait gait)
+        {
+            double[] p0 = _parameterValues;
+            double[] s = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            double epsx = 0.0001;
+            double radius = 0.1;
+            double rho = 50.0;
+            double diffstep = 0.000001;
+            int maxits = 0;
+            alglib.minnsstate state;
+            alglib.minnsreport rep;
+            double[] p1;
+
+            alglib.minnscreatef(p0, diffstep, out state);
+            alglib.minnssetalgoags(state, radius, rho);
+            alglib.minnssetcond(state, epsx, maxits);
+            alglib.minnssetscale(state, s);
+
+            alglib.minnssetnlc(state, 5, 3);
+
+            alglib.minnsoptimize(state, evaluateObjFuncAndConstraintsNumerical, null, null);
+            alglib.minnsresults(state, out p1, out rep);
+            Console.WriteLine("{0}", alglib.ap.format(p1, 15));
+
+            Console.ReadLine();
+            testImpact(gait, p1);
         }
         
         public void evaluateGradientsAndHessian()
@@ -264,7 +291,7 @@ namespace BipedRobot
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, exp).RealValue;
         }
 
-        public void evaluateObjFuncAndConstraints(double[] p, double[] objFunction, double[,] jacobian, object obj)
+        public void evaluateObjFuncAndConstraintsAnalytical(double[] p, double[] objFunction, double[,] jacobian, object obj)
         {
             for (int i = 0; i < p.Length; i++)
             {
@@ -287,6 +314,26 @@ namespace BipedRobot
                 jacobian[7, i] = evaluateFunction(_ineqconstraint2GradientArray[i]);
                 jacobian[8, i] = evaluateFunction(_ineqconstraint3GradientArray[i]);
             }
+
+
+            objFunction[0] = evaluateFunction(_performanceIndex);
+            objFunction[1] = evaluateFunction(_eqConstraint1);
+            objFunction[2] = evaluateFunction(_eqConstraint2);
+            objFunction[3] = evaluateFunction(_eqConstraint3);
+            objFunction[4] = evaluateFunction(_eqConstraint4);
+            objFunction[5] = evaluateFunction(_eqConstraint5);
+            objFunction[6] = evaluateFunction(_ineqConstraint1);
+            objFunction[7] = evaluateFunction(_ineqConstraint2);
+            objFunction[8] = evaluateFunction(_ineqConstraint3);
+        }
+        public void evaluateObjFuncAndConstraintsNumerical(double[] p, double[] objFunction, double[,] jacobian, object obj)
+        {
+            for (int i = 0; i < p.Length; i++)
+            {
+                _parameters["P" + i.ToString()] = p[i];
+
+            }
+            
 
 
             objFunction[0] = evaluateFunction(_performanceIndex);
