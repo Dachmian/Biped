@@ -12,8 +12,8 @@ namespace BipedRobot{
             Biped biped = new Biped (@"../../basic_randomized_set.xml");
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
-            //gaitSearch.run(ref biped);
-            test2(biped);
+            gaitSearch.run(ref biped);
+            //test2(biped);
             
         }
 

@@ -216,15 +216,46 @@ namespace BipedRobot
         }
 
     }
-    public class RiemannSum
+    public static class RiemannSum
     {
-        public double[,] run()
+        public delegate double integralFunc(double theta);
+
+        public static double[,] calculateFirstIntegral(integralFunc f)
         {
-            double dx = 0.001;
-            double a = 0;
+            double dx = 0.002;
             double b = 1;
             double val = 0;
+            double theta = 0;
+            double[,] RES = new double[(int)(b / dx), 2];
+            for(int i = 0;i < b/ dx; i++)
+            {
+                val += f(theta) * dx;
 
+                RES[i, 0] = theta;
+                RES[i, 1] = val;
+
+                theta += dx;
+            }
+            return RES;
+        }
+        public static double[,] calculateSecondIntegral(integralFunc f, double[,] firstIntegralVal)
+        {
+            double dx = 0.002;
+            double b = 1;
+            double val = 0;
+            double theta = 0;
+            double[,] RES = new double[(int)(b / dx), 2];
+            for (int i = 0; i < b / dx; i++)
+            {
+
+                val += Math.Exp(firstIntegralVal[i, 1]) * f(theta);
+
+                RES[i, 0] = theta;
+                RES[i, 1] = val;
+
+                theta += dx;
+            }
+            return RES;
         }
     }
 }

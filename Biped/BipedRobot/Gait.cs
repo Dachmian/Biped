@@ -226,7 +226,7 @@ namespace BipedRobot
             Console.WriteLine("ute av impact");
             setVHC(ref gait, numberOfPoints);
             //begin search
-            AGSImpact ags = new AGSImpact(gait.vhc);
+            AGS ags = new AGS(gait);
             //ags.runAnalytical(gait);
             ags.runNumerical(gait);
 
@@ -490,7 +490,6 @@ namespace BipedRobot
             set
             {
                 _phi1Parameters = value;
-                _phi1Parameters.Add("theta", 0);
             }
         }
         public Dictionary<string, FloatingPoint> phi2Parameters
@@ -502,7 +501,6 @@ namespace BipedRobot
             set
             {
                 _phi2Parameters = value;
-                _phi2Parameters.Add("theta", 0);
             }
         }
         public Dictionary<string, FloatingPoint> phi3Parameters
@@ -514,7 +512,6 @@ namespace BipedRobot
             set
             {
                 _phi3Parameters = value;
-                _phi3Parameters.Add("theta", 0);
 
             }
         }
