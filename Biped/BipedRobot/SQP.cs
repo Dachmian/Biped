@@ -59,9 +59,7 @@ namespace BipedRobot
             int len = vhc.phi1Parameters.Count;
             _parameterValues = new double[3*len];
 
-            Expression ddtheta = Infix.ParseOrUndefined("ddtheta");
-            Expression dthetaSquared = Infix.ParseOrUndefined("dtheta^2");
-            Expression theta = Infix.ParseOrUndefined("theta");
+            
 
             _parameters = new Dictionary<string, FloatingPoint>();
             _parameters.Add("g", vhc.parameters["g"]);
@@ -83,29 +81,29 @@ namespace BipedRobot
             _parameters.Add("theta", 0);
             _parameters.Add("dtheta", 0);
             _parameters.Add("ddtheta", 0);
-            _parameters.Add("dtheta0", 0);
-            _parameters.Add("dthetaT", 0);
+            _parameters.Add("dtheta0Squared", 0);
+            _parameters.Add("dthetaTSquared", 0);
             _parameters.Add("ddtheta0", 0);
             _parameters.Add("ddthetaT", 0);
 
             int k = 0;
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi1Parameters)
             {
-                _parameterValues[k] = entry.Value.RealValue; //1;
+                _parameterValues[k] = 1;//entry.Value.RealValue; //1;
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi2Parameters)
             {
 
-                _parameterValues[k] = entry.Value.RealValue; //1;
+                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
 
             }
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi3Parameters)
             {
-                _parameterValues[k] = entry.Value.RealValue; //1;
+                _parameterValues[k] = 1;//entry.Value.RealValue; //
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
@@ -139,12 +137,12 @@ namespace BipedRobot
             gamma1 = Structure.Substitute("phi1", vhc.phi1, gamma1);
             fs.Close();
 
-            Expression torque1 = alpha1 * ddtheta + beta1 * dthetaSquared + gamma1;
+            Expression torque1 = alpha1 * "ddtheta" + beta1 * "dthetaSquared" + gamma1;
             Expression torque1Start = Structure.Substitute("theta", "0", torque1);
-            torque1Start = Structure.Substitute("dtheta", "dtheta0", torque1Start);
+            torque1Start = Structure.Substitute("dthetaSquared", "dtheta0Squared", torque1Start);
             torque1Start = Structure.Substitute("ddtheta", "ddtheta0", torque1Start);
             Expression torque1End = Structure.Substitute("theta", "1", torque1);
-            torque1End = Structure.Substitute("dtheta", "dthetaT", torque1End);
+            torque1End = Structure.Substitute("dthetaSquared", "dthetaTSquared", torque1End);
             torque1End = Structure.Substitute("ddtheta", "ddthetaT", torque1End);
 
             fs = new StreamReader(@"../../../alpha3.txt");
@@ -172,12 +170,12 @@ namespace BipedRobot
             gamma3 = Structure.Substitute("phi3", vhc.phi3, gamma3);
             fs.Close();
 
-            Expression torque2 = alpha3 * ddtheta + beta3 * dthetaSquared + gamma3;
+            Expression torque2 = alpha3 * "ddtheta" + beta3 * "dthetaSquared" + gamma3;
             Expression torque2Start = Structure.Substitute("theta", "0", torque2);
-            torque2Start = Structure.Substitute("dtheta", "dtheta0", torque2Start);
+            torque2Start = Structure.Substitute("dthetaSquared", "dtheta0Squared", torque2Start);
             torque2Start = Structure.Substitute("ddtheta", "ddtheta0", torque2Start);
             Expression torque2End = Structure.Substitute("theta", "1", torque2);
-            torque2End = Structure.Substitute("dtheta", "dthetaT", torque2End);
+            torque2End = Structure.Substitute("dthetaSquared", "dthetaTSquared", torque2End);
             torque2End = Structure.Substitute("ddtheta", "ddthetaT", torque2End);
 
             Expression impactPosFirstLine = vhc.impactPosFirstLine;
@@ -333,10 +331,10 @@ namespace BipedRobot
         {
             double[] p0 = _parameterValues;
             double[] s = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-            double epsx = 0.0001;
+            double epsx = 0.001;
             double radius = 0.1;
             double rho = 50.0;
-            double diffstep = 0.00001;
+            double diffstep = 0.001;
             int maxits = 0;
             alglib.minnsstate state;
             alglib.minnsreport rep;
@@ -346,7 +344,7 @@ namespace BipedRobot
             alglib.minnssetcond(state, epsx, maxits);
             alglib.minnssetscale(state, s);
 
-            alglib.minnssetnlc(state, 7, 5);
+            alglib.minnssetnlc(state, 5, 4);
             try
             {
                 alglib.minnsoptimize(state, evaluateObjFuncAndConstraintsNumerical, null, null);
@@ -359,7 +357,7 @@ namespace BipedRobot
             Console.WriteLine("{0}", alglib.ap.format(p1, 15));
 
             Console.ReadLine();
-            testImpact(gait, p1);
+            //testImpact(gait, p1);
         }
         
         
@@ -367,7 +365,14 @@ namespace BipedRobot
         {
             string a = Infix.Format(exp);
             exp = Infix.ParseOrUndefined(a);
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, exp).RealValue;
+            try
+            {
+                return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, exp).RealValue;
+            }
+            catch (Exception)
+            {
+                return Math.Pow(10, 300);
+            }
         }
 
         public void evaluateObjFuncAndConstraintsAnalytical(double[] p, double[] objFunction, double[,] jacobian, object obj)
@@ -407,14 +412,13 @@ namespace BipedRobot
         }
         public void evaluateObjFuncAndConstraintsNumerical(double[] p, double[] objFunction, object obj)
         {
-            double dthetaMax = evaluateDthetaConstraint();
+            double dthetaMin = evaluateDthetaConstraint();
             double alphaMax = evaluateAlphaConstraint();
             for (int i = 0; i < p.Length; i++)
             {
                 _parameters["P" + i.ToString()] = p[i];
 
             }
-            
 
 
             objFunction[0] = evaluateFunction(_performanceIndex);
@@ -423,13 +427,14 @@ namespace BipedRobot
             objFunction[3] = evaluateFunction(_eqConstraint3);
             objFunction[4] = evaluateFunction(_eqConstraint4);
             objFunction[5] = evaluateFunction(_eqConstraint5);
-            objFunction[6] = evaluateFunction(_eqConstraint6);
-            objFunction[7] = evaluateFunction(_eqConstraint7);
-            objFunction[8] = evaluateFunction(_ineqConstraint1);
-            objFunction[9] = evaluateFunction(_ineqConstraint2);
-            objFunction[10] = evaluateFunction(_ineqConstraint3);
-            objFunction[11] = -dthetaMax;
-            objFunction[12] = alphaMax;
+            //objFunction[6] = evaluateFunction(_eqConstraint6);
+            //objFunction[7] = evaluateFunction(_eqConstraint7);
+            objFunction[6] = evaluateFunction(_ineqConstraint1);
+            objFunction[7] = evaluateFunction(_ineqConstraint2);
+            objFunction[8] = evaluateFunction(_ineqConstraint3);
+            //objFunction[11] = -dthetaMin;
+            objFunction[9] = -alphaMax;
+
         }
 
 
@@ -440,54 +445,63 @@ namespace BipedRobot
             double[,] secondIntegral = RiemannSum.calculateSecondIntegral(_gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral);
 
             int len = secondIntegral.Length/secondIntegral.Rank;
-            double dthetaTSquare = -secondIntegral[len - 1, 1] / (1 - Math.Exp(firstIntegral[len - 1, 1]) * Math.Pow(-evaluateFunction(_ineqConstraint1), 2));
-            double dtheta0Square = Math.Pow(-evaluateFunction(_ineqConstraint1), 2) * dthetaTSquare;
+            double dthetaTSquared = -secondIntegral[len - 1, 1] / (1 - Math.Exp(-firstIntegral[len - 1, 1]) * Math.Pow(-evaluateFunction(_ineqConstraint1), 2));
+            double dtheta0Squared = Math.Pow(-evaluateFunction(_ineqConstraint1), 2) * dthetaTSquared;
 
 
             //set parameters for use later
-            double dthetaT = Math.Sqrt(dthetaTSquare);
-            double dtheta0 = Math.Sqrt(dtheta0Square);
-            if(dthetaT == double.NaN || double.IsInfinity(dthetaT))
+            
+            if(double.IsNaN(dthetaTSquared))
             {
-                _parameters["dthetaT"] = -Math.Pow(10, 300);
-                _parameters["ddthetaT"] = -Math.Pow(10, 300);
+                _parameters["dthetaTSquared"] = (FloatingPoint)(- Math.Pow(10, 300));
+                _parameters["ddthetaT"] = (FloatingPoint)(- Math.Pow(10, 300));
+            }
+            else if (double.IsPositiveInfinity(dthetaTSquared))
+            {
+                _parameters["dthetaTSquared"] = (FloatingPoint)Math.Pow(10, 300);
+                _parameters["ddthetaT"] = (FloatingPoint)Math.Pow(10, 300);
             }
             else
             {
-                _parameters["dthetaT"] = Math.Sqrt(dthetaTSquare);
-                _parameters["ddthetaT"] = BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquare) }), _gait.vhc.evalAlpha, _gait.vhc.evalBeta, _gait.vhc.evalGamma);
+                _parameters["dthetaTSquared"] = dthetaTSquared;
+                _parameters["ddthetaT"] = (FloatingPoint)BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new double[] { 1, dthetaTSquared }), _gait.vhc.evalAlpha, _gait.vhc.evalBeta, _gait.vhc.evalGamma);
             }
-            if(dtheta0 == double.NaN || double.IsInfinity(dtheta0))
+            if(double.IsNaN(dtheta0Squared))
             {
-                _parameters["dtheta0"] = -Math.Pow(10, 300);
-                _parameters["ddtheta0"] = -Math.Pow(10, 300);
+                _parameters["dtheta0Squared"] = (FloatingPoint)(-Math.Pow(10, 300));
+                _parameters["ddtheta0"] = (FloatingPoint)(-Math.Pow(10, 300));
+            }
+            else if (double.IsPositiveInfinity(dtheta0Squared))
+            {
+                _parameters["dtheta0Squared"] = (FloatingPoint)Math.Pow(10, 300);
+                _parameters["ddtheta0"] = (FloatingPoint)Math.Pow(10, 300);
             }
             else
             {
-                _parameters["dtheta0"] = Math.Sqrt(dtheta0Square);
-                _parameters["ddtheta0"] = BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Square) }), _gait.vhc.evalAlpha, _gait.vhc.evalBeta, _gait.vhc.evalGamma);
+                _parameters["dtheta0Squared"] = (FloatingPoint)dtheta0Squared;
+                _parameters["ddtheta0"] = (FloatingPoint)BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new double[] { 0, dtheta0Squared }), _gait.vhc.evalAlpha, _gait.vhc.evalBeta, _gait.vhc.evalGamma);
             }
             double[] dthetaSquare = new double[len];
             double min = 0;
             double dthetatSquare = 0;
             for (int i = 0; i < len; i++)
             {
-                dthetatSquare = -secondIntegral[i, 1] / (1 - Math.Exp(firstIntegral[i, 1]) * dtheta0Square);
+                dthetatSquare = -secondIntegral[i, 1] + Math.Exp(firstIntegral[i, 1]) * dtheta0Squared;
                 if(dthetatSquare < min)
                 {
                     min = dthetatSquare;
                 }
             }
             if (double.IsNegativeInfinity(min)){
-                return -Math.Pow(10, 300);
+                return (-Math.Pow(10, 300));
             }
             if (double.IsPositiveInfinity(min))
             {
-                return Math.Pow(10, 300);
+                return (Math.Pow(10, 300));
             }
-            if (min ==double.NaN)
+            if (double.IsNaN(min))
             {
-                return -Math.Pow(10, 300);
+                return (-Math.Pow(10, 300));
             }
             return min;
         }

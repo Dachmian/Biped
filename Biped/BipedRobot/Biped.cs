@@ -615,7 +615,8 @@ namespace BipedRobot
 
         public static double rhs1D(Vector<double> THETA, coefficientFunction alpha, coefficientFunction beta, coefficientFunction gamma)
         {
-            double ddtheta = (-beta(THETA[0]) * Math.Pow(THETA[1], 2) - gamma(THETA[0])) / alpha(THETA[0]);
+            //vector with 1 = theta, 2 = dtheta^2
+            double ddtheta = (-beta(THETA[0]) * THETA[1] - gamma(THETA[0])) / alpha(THETA[0]);
             return ddtheta;
         }
 

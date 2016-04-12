@@ -66,35 +66,33 @@ namespace BipedRobot{
             int numberOfPoints = 6;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            
+            double[] p = new double[18]{ -1.649336143134640,1.884955592153880,-7.068583470577030,1.570796326794900,0.000000000000000,1.884955592153880,0.000000000000000,-1.884955592153880,-4.712388980384690,12.566370614359200,4.712388980384690,-1.884955592153880,-1.099557428756430,7.539822368615500,-4.712388980384690,3.141592653589790,0.000000000000000,-1.884955592153880};
             Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
             gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P0"] = 0.146155955657700;
-            tuple.Item1["P1"] = 0.131950378278521;
-            tuple.Item1["P2"] = 0.146155955657700;
-            tuple.Item1["P3"] = 0.131950378278521;
-            tuple.Item1["P4"] = 0.146155955657700;
-            tuple.Item1["P5"] = -0.351186852776185;
+
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
             gait.vhc.phi1Parameters = tuple.Item1;
             
             tuple = brCrv.phi2ToString();
             gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P6"] = 3.108861092790050;
-            tuple.Item1["P7"] = 1.484243139380400;
-            tuple.Item1["P8"] = -4.126755127401950;
-            tuple.Item1["P9"] = -6.776195404447800;
-            tuple.Item1["P10"] = 6.309842438987150;
-            tuple.Item1["P11"] = 13.793249658094000;
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
             gait.vhc.phi2Parameters = tuple.Item1;
-            //{0.408525121245220,0.087820862782903,-0.232981079597844,-0.553883349000211,-0.411839675470575,0.351188188376620}
+            
             tuple = brCrv.phi3ToString();
             gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
-            tuple.Item1["P12"] = 0.408525121245220;
-            tuple.Item1["P13"] = 0.087820862782903;
-            tuple.Item1["P14"] = -0.232981079597844;
-            tuple.Item1["P15"] = -0.553883349000211;
-            tuple.Item1["P16"] = -0.411839675470575;
-            tuple.Item1["P17"] = 0.351188188376620;
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
             gait.vhc.phi3Parameters = tuple.Item1;
 
             gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
