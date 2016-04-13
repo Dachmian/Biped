@@ -89,7 +89,7 @@ namespace BipedRobot
             int k = 0;
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi1Parameters)
             {
-                _parameterValues[k] = 1;//entry.Value.RealValue; //1;
+                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
@@ -103,10 +103,12 @@ namespace BipedRobot
             }
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi3Parameters)
             {
-                _parameterValues[k] = 1;//entry.Value.RealValue; //
+                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
+
+            _parameterValues = new double[30] { 1.002677806583060, 0.973626714059529, 0.974818663249441, 0.975161177554158, 0.973966193029470, 0.969903727868665, 0.960170394076285, 0.937599240792406, 0.888098904754680, 0.911104026678500, 0.986576776557014, 0.983218078674456, 0.987832792775939, 0.992391672194564, 0.996558129289077, 0.999730534966211, 1.000582664493830, 0.995792455591024, 0.975884520996868, 0.997017519177504, 0.898907034694419, 0.885021091002188, 0.891598071941415, 0.898378848358458, 0.905364451193932, 0.912687323064369, 0.920607258611730, 0.929670828893752, 1.100905857568060, 1.111317288007510 };
             StreamReader fs = null;
             fs = new StreamReader(@"../../../alpha1.txt");
             string temp = fs.ReadLine();
@@ -215,8 +217,7 @@ namespace BipedRobot
             impactNegThirdLine = Structure.Substitute("dphi3", vhc.dphi3, impactNegThirdLine);
             impactNegThirdLine = Structure.Substitute("theta", "1", impactNegThirdLine);
 
-            _performanceIndex = Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegSecondLine / impactPosSecondLine,"2") + Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegThirdLine / impactPosThirdLine,"2");
-
+            
             Expression phi1Start = vhc.phi1;
             phi1Start = Structure.Substitute("theta", "0", phi1Start);
             Expression phi1End = vhc.phi1;
@@ -233,6 +234,7 @@ namespace BipedRobot
             phi3End = Structure.Substitute("theta", "1", phi3End);
 
 
+            _performanceIndex = Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegSecondLine / impactPosSecondLine, "2") + Expression.Pow(impactNegFirstLine / impactPosFirstLine - impactNegThirdLine / impactPosThirdLine, "2") + Expression.Pow(torque1Start - torque2End, "2") + Expression.Pow(torque2Start - torque1End, "2") + Expression.Pow(phi1Start + phi3Start, "2") + Expression.Pow(phi1End + phi3End, "2");
             //normalisere. gange med 0 gir -1. phi1 starter med å være negativ. phi3 starter med å være positiv
             _eqConstraint1 = (phi1End + phi1Start);
             _eqConstraint2 = (phi2End - phi2Start);
@@ -330,11 +332,11 @@ namespace BipedRobot
         public void runNumerical(BRgait gait)
         {
             double[] p0 = _parameterValues;
-            double[] s = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+            double[] s = new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
             double epsx = 0.001;
             double radius = 0.1;
             double rho = 50.0;
-            double diffstep = 0.001;
+            double diffstep = 0.01;
             int maxits = 0;
             alglib.minnsstate state;
             alglib.minnsreport rep;
@@ -344,7 +346,7 @@ namespace BipedRobot
             alglib.minnssetcond(state, epsx, maxits);
             alglib.minnssetscale(state, s);
 
-            alglib.minnssetnlc(state, 5, 4);
+            alglib.minnssetnlc(state, 0, 5);
             try
             {
                 alglib.minnsoptimize(state, evaluateObjFuncAndConstraintsNumerical, null, null);
@@ -422,18 +424,18 @@ namespace BipedRobot
 
 
             objFunction[0] = evaluateFunction(_performanceIndex);
-            objFunction[1] = evaluateFunction(_eqConstraint1);
-            objFunction[2] = evaluateFunction(_eqConstraint2);
-            objFunction[3] = evaluateFunction(_eqConstraint3);
-            objFunction[4] = evaluateFunction(_eqConstraint4);
-            objFunction[5] = evaluateFunction(_eqConstraint5);
+            //objFunction[1] = evaluateFunction(_eqConstraint1);
+            //objFunction[2] = evaluateFunction(_eqConstraint2);
+            //objFunction[3] = evaluateFunction(_eqConstraint3);
+            //objFunction[4] = evaluateFunction(_eqConstraint4);
+            //objFunction[5] = evaluateFunction(_eqConstraint5);
             //objFunction[6] = evaluateFunction(_eqConstraint6);
             //objFunction[7] = evaluateFunction(_eqConstraint7);
-            objFunction[6] = evaluateFunction(_ineqConstraint1);
-            objFunction[7] = evaluateFunction(_ineqConstraint2);
-            objFunction[8] = evaluateFunction(_ineqConstraint3);
-            //objFunction[11] = -dthetaMin;
-            objFunction[9] = -alphaMax;
+            objFunction[1] = evaluateFunction(_ineqConstraint1);
+            objFunction[2] = evaluateFunction(_ineqConstraint2);
+            objFunction[3] = evaluateFunction(_ineqConstraint3);
+            objFunction[4] = -dthetaMin;
+            objFunction[5] = -alphaMax;
 
         }
 
@@ -482,11 +484,11 @@ namespace BipedRobot
                 _parameters["ddtheta0"] = (FloatingPoint)BRReducedDynamics.rhs1D(Vector<double>.Build.Dense(new double[] { 0, dtheta0Squared }), _gait.vhc.evalAlpha, _gait.vhc.evalBeta, _gait.vhc.evalGamma);
             }
             double[] dthetaSquare = new double[len];
-            double min = 0;
-            double dthetatSquare = 0;
-            for (int i = 0; i < len; i++)
+            double min = -secondIntegral[0, 1] + Math.Exp(-firstIntegral[0, 1]) * dtheta0Squared;
+            double dthetatSquare;
+            for (int i = 1; i < len; i++)
             {
-                dthetatSquare = -secondIntegral[i, 1] + Math.Exp(firstIntegral[i, 1]) * dtheta0Squared;
+                dthetatSquare = -secondIntegral[i, 1] + Math.Exp(-firstIntegral[i, 1]) * dtheta0Squared;
                 if(dthetatSquare < min)
                 {
                     min = dthetatSquare;

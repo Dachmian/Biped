@@ -40,3 +40,14 @@ C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRo
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.graph.resources
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Properties.Resources.resources
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.csproj.GenerateResource.Cache
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\alglibnet2.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsec.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsecCS.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FSharp.Core.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.FSharp.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Symbolics.dll
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsec.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsecCS.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FSharp.Core.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.FSharp.xml
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Symbolics.xml

@@ -55,28 +55,24 @@ namespace BipedRobot
 
         public void setInitialControlPoints(int numOfPoints)
         {
-            _initialControlPointsq1[0] = _startAngle;
-            _initialControlPointsq1[1] = _startAngle / 2;
-            _initialControlPointsq1[2] = _startAngle / 4;
-            _initialControlPointsq1[3] = _endAngle / 4;
-            _initialControlPointsq1[4] = _endAngle / 2;
-            _initialControlPointsq1[5] = _endAngle;
+            double factor = (endAngle - startAngle) / numOfPoints;
+            for (int i = 0; i < numOfPoints; i++)
+            {
+                _initialControlPointsq1[i] = _startAngle + i*factor;
+            }
 
 
-            _initialControlPointsq2[0] = Math.PI / 10;
-            _initialControlPointsq2[1] = 0;
-            _initialControlPointsq2[2] = -Math.PI / 10;
-            _initialControlPointsq2[3] = -Math.PI / 10;
-            _initialControlPointsq2[4] = 0;
-            _initialControlPointsq2[5] = Math.PI / 10;
+            
+            for (int i = 0; i < numOfPoints; i++)
+            {
+                _initialControlPointsq2[i] = 0;
+            }
 
 
-            _initialControlPointsq3[0] = _endAngle;
-            _initialControlPointsq3[1] = _endAngle / 2;
-            _initialControlPointsq3[2] = 0;
-            _initialControlPointsq3[3] = 0;
-            _initialControlPointsq3[4] = _startAngle / 2;
-            _initialControlPointsq3[5] = _startAngle;
+            for (int i = 0; i < numOfPoints; i++)
+            {
+                _initialControlPointsq1[i] = _endAngle - i * factor;
+            }
         }
         public void setPosture()
         {
@@ -217,7 +213,7 @@ namespace BipedRobot
         public static void run(ref Biped biped)
         {
             //first time running use rand to find a valid gait
-            int numberOfPoints = 6;
+            int numberOfPoints = 10;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
             /*while (testImpact(gait))
             {
