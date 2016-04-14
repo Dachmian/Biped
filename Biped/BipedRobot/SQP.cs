@@ -89,26 +89,26 @@ namespace BipedRobot
             int k = 0;
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi1Parameters)
             {
-                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
+                _parameterValues[k] = entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi2Parameters)
             {
 
-                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
+                _parameterValues[k] = entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
 
             }
             foreach (KeyValuePair<string, FloatingPoint> entry in vhc.phi3Parameters)
             {
-                _parameterValues[k] = 1;//entry.Value.RealValue; //1;//
+                _parameterValues[k] = entry.Value.RealValue; //1;//
                 _parameters.Add(entry.Key, entry.Value);
                 k++;
             }
 
-            _parameterValues = new double[30] { 1.002677806583060, 0.973626714059529, 0.974818663249441, 0.975161177554158, 0.973966193029470, 0.969903727868665, 0.960170394076285, 0.937599240792406, 0.888098904754680, 0.911104026678500, 0.986576776557014, 0.983218078674456, 0.987832792775939, 0.992391672194564, 0.996558129289077, 0.999730534966211, 1.000582664493830, 0.995792455591024, 0.975884520996868, 0.997017519177504, 0.898907034694419, 0.885021091002188, 0.891598071941415, 0.898378848358458, 0.905364451193932, 0.912687323064369, 0.920607258611730, 0.929670828893752, 1.100905857568060, 1.111317288007510 };
+            _parameterValues = new double[30] { 0.326125954351259, 2.512867376772220, 8.480663605725440, 15.077341228440900, 13.192454314651800, -0.001399966798738, -13.194721936778300, -15.077218263705900, -8.470694669721080, -3.083156563756360, -0.241892853717779, 0.002698801802706, 0.000828045203061, -0.000451813704750, -0.001070967024812, -0.000838065218348, 0.000675816832445, 0.004443768025535, 0.013063344438370, 0.060359965981457, 0.000413219209426, -0.025874396849205, -0.021692175512334, -0.018652579906066, -0.016597188152756, -0.015474270888756, -0.015470123412948, -0.017509386319584, -0.026241518882314, -0.109350966003813 };
             StreamReader fs = null;
             fs = new StreamReader(@"../../../alpha1.txt");
             string temp = fs.ReadLine();
@@ -422,7 +422,7 @@ namespace BipedRobot
 
             }
 
-
+            
             objFunction[0] = evaluateFunction(_performanceIndex);
             //objFunction[1] = evaluateFunction(_eqConstraint1);
             //objFunction[2] = evaluateFunction(_eqConstraint2);
