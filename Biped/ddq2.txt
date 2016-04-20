@@ -1,1 +1,1 @@
-ddq2 = ddphi2 * dtheta * dtheta + ddtheta * dphi2;
+ddq2 = ddphi2 * dtheta * dtheta + dphi2 * ddtheta;

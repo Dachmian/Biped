@@ -63,10 +63,10 @@ namespace BipedRobot{
         static void test2(Biped biped)
         {
             
-            int numberOfPoints = 8;
+            int numberOfPoints = 4;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            double[] p = new double[30] { 0.393455185685367, 2.518578412117590, 8.490336481769470, 15.091455373908100, 13.211145781375300, 0.020964370563989, -13.171800581937600, -15.060877069283400, -8.474132079245000, -3.141592653589630, 0.040460535667833, 0.000000000000020, 0.000000007670157, 0.000003976431357, 0.000133842184770, 0.001233759685658, 0.000609239020373, 0.000531214470140, 0.000429321345324, 0.000552264440864, 0.000000000006640, 0.000000255817756, 0.000028495642102, 0.013625771512920, 0.000578276785382, 0.000558020495594, 0.000565025225917, 0.000515976264676, 0.000401681560093, 0.000013856417723 };
+            double[] p = { -1.12283194505, 4.79402021549, -0.761855899323, -4.30651425382, -2.43197378619, 2.44812379607, 2.64854178928, 0.613506850183, -4.84721295451, -0.909906754727, 3.50138134178, -4.46585242224 };
             Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
             gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
 
@@ -102,6 +102,70 @@ namespace BipedRobot{
             gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
             gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
             gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
+
+            Console.WriteLine(Infix.Format(gait.vhc.phi1));
+            Console.WriteLine(Infix.Format(gait.vhc.phi2));
+            Console.WriteLine(Infix.Format(gait.vhc.phi3));
+
+            Console.WriteLine(Infix.Format(gait.vhc.dphi1));
+            Console.WriteLine(Infix.Format(gait.vhc.dphi2));
+            Console.WriteLine(Infix.Format(gait.vhc.dphi3));
+
+            Console.WriteLine(Infix.Format(gait.vhc.ddphi1));
+            Console.WriteLine(Infix.Format(gait.vhc.ddphi2));
+            Console.WriteLine(Infix.Format(gait.vhc.ddphi3));
+
+            Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+
+            //gaitSearch.setAndVerifyParameters(ref gait);
+            //Console.WriteLine(gait.gaitParam.dtheta0);
+            //Console.WriteLine(gait.gaitParam.dthetaT);
+            
+        }
+
+        static void findGaitsManually(Biped biped)
+        {
+            int numberOfPoints = 4;
+            BRgait gait = new BRgait(biped.param, numberOfPoints);
+            BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
+            double[] p = { -0.557198221418, -70.698660226300007, 10.6834237616, 21.457566466900001, 0.366864041617, 178.782483436999996, -38.987924350500002, 62.071922568399998, 5.571982214180000e-01, -3.722018221420000e+02, 8.130948599769999e+01, -6.859447995750000e+02 };
+            Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
+            gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
+
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
+            gait.vhc.phi1Parameters = tuple.Item1;
+
+            tuple = brCrv.phi2ToString();
+            gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
+            gait.vhc.phi2Parameters = tuple.Item1;
+
+            tuple = brCrv.phi3ToString();
+            gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
+            for (int i = 0; i < p.Length; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = p[i];
+
+            }
+            gait.vhc.phi3Parameters = tuple.Item1;
+
+            gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
+            gait.vhc.dphi2 = Infix.ParseOrUndefined(brCrv.dphi2ToString());
+            gait.vhc.dphi3 = Infix.ParseOrUndefined(brCrv.dphi3ToString());
+
+            gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
+            gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
+            gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
             Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
@@ -109,7 +173,8 @@ namespace BipedRobot{
             gaitSearch.setAndVerifyParameters(ref gait);
             Console.WriteLine(gait.gaitParam.dtheta0);
             Console.WriteLine(gait.gaitParam.dthetaT);
-            
         }
     }
+
+    
 }
