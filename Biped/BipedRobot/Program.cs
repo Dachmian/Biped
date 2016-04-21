@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MathNet.Symbolics;
+using System.IO;
 
 namespace BipedRobot{
     static class Program{
@@ -13,7 +14,7 @@ namespace BipedRobot{
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //gaitSearch.run(ref biped);
-            test2(biped);
+            findGaitsManually(biped);
             
         }
 
@@ -130,31 +131,33 @@ namespace BipedRobot{
             int numberOfPoints = 4;
             BRgait gait = new BRgait(biped.param, numberOfPoints);
             BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
-            double[] p = { -0.557198221418, -70.698660226300007, 10.6834237616, 21.457566466900001, 0.366864041617, 178.782483436999996, -38.987924350500002, 62.071922568399998, 5.571982214180000e-01, -3.722018221420000e+02, 8.130948599769999e+01, -6.859447995750000e+02 };
+
+
+            string[] parameters = File.ReadAllLines(@"../../../parameters.txt");
             Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
             gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
 
-            for (int i = 0; i < p.Length; i++)
+            for (int i = 0; i < 4; i++)
             {
-                tuple.Item1["P" + i.ToString()] = p[i];
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[4 - 1 - i]);
 
             }
             gait.vhc.phi1Parameters = tuple.Item1;
 
             tuple = brCrv.phi2ToString();
             gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
-            for (int i = 0; i < p.Length; i++)
+            for (int i = 4; i < 8; i++)
             {
-                tuple.Item1["P" + i.ToString()] = p[i];
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[12 - 1 - i]);
 
             }
             gait.vhc.phi2Parameters = tuple.Item1;
 
             tuple = brCrv.phi3ToString();
             gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
-            for (int i = 0; i < p.Length; i++)
+            for (int i = 8; i < 12; i++)
             {
-                tuple.Item1["P" + i.ToString()] = p[i];
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[20 - 1 - i]);
 
             }
             gait.vhc.phi3Parameters = tuple.Item1;
@@ -166,13 +169,28 @@ namespace BipedRobot{
             gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
             gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
             gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
-            Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
 
-            gaitSearch.setAndVerifyParameters(ref gait);
-            Console.WriteLine(gait.gaitParam.dtheta0);
-            Console.WriteLine(gait.gaitParam.dthetaT);
+            Console.WriteLine(gait.vhc.evalAlpha(0.75));
+            Console.WriteLine(gait.vhc.evalBeta(0.75));
+            Console.WriteLine(gait.vhc.evalGamma(0.75));
+            Console.WriteLine("");
+            Console.WriteLine(gait.vhc.evalPhi1(0.75));
+            Console.WriteLine(gait.vhc.evalPhi2(0.75));
+            Console.WriteLine(gait.vhc.evalPhi3(0.75));
+            Console.WriteLine("");
+            Console.WriteLine(gait.vhc.evalDphi1(0.75));
+            Console.WriteLine(gait.vhc.evalDphi2(0.75));
+            Console.WriteLine(gait.vhc.evalDphi3(0.75));
+            Console.WriteLine("");
+            Console.WriteLine(gait.vhc.evalDdphi1(0.75));
+            Console.WriteLine(gait.vhc.evalDdphi2(0.75));
+            Console.WriteLine(gait.vhc.evalDdphi3(0.75));
+            //gaitSearch.setAndVerifyParameters(ref gait);
+            //Console.WriteLine(gait.gaitParam.dtheta0);
+            //Console.WriteLine(gait.gaitParam.dthetaT);
         }
     }
 

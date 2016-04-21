@@ -393,11 +393,8 @@ namespace BipedRobot
             _phi3Parameters = new Dictionary<string, FloatingPoint>();
 
             StreamReader fs = null;
-            fs = new StreamReader(@"../../../q3.txt");
-            string temp = fs.ReadLine();
-            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _q3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
+            string temp;
+            
 
             fs = new StreamReader(@"../../../ddq3.txt");
             temp = fs.ReadLine();
@@ -423,40 +420,25 @@ namespace BipedRobot
             _gamma = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactPosFirstLine.txt");
+            fs = new StreamReader(@"../../../impactFirstLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "").Replace("0.2e1","2");
-            _impactPosFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            temp = temp.Replace("0.2e1","2").Replace("pow","");
+            temp = temp.Replace(", 2)", ")^2");
+            _impactFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactPosSecondLine.txt");
+            fs = new StreamReader(@"../../../impactSecondLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "").Replace("0.2e1", "2");
-            _impactPosSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            temp = temp.Replace("0.2e1", "2").Replace("pow", "");
+            temp = temp.Replace(", 2)", ")^2");
+            _impactSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactPosThirdLine.txt");
+            fs = new StreamReader(@"../../../impactThirdLine.txt");
             temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "").Replace("0.2e1", "2");
-            _impactPosThirdLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
-
-            fs = new StreamReader(@"../../../impactNegFirstLine.txt");
-            temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "");
-            _impactNegFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
-
-            fs = new StreamReader(@"../../../impactNegSecondLine.txt");
-            temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "");
-            _impactNegSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
-
-            fs = new StreamReader(@"../../../impactNegThirdLine.txt");
-            temp = fs.ReadLine();
-            temp = temp.Replace("(double)", "");
-            _impactNegThirdLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            temp = temp.Replace("0.2e1", "2").Replace("pow", "");
+            temp = temp.Replace(", 2)", ")^2");
+            _impactThirdLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
             setPhysicalParameters(param, numberOfPoints);
         }
@@ -917,16 +899,12 @@ namespace BipedRobot
         }
         #endregion
         #region impacts
-        private Expression _impactPosFirstLine;
-        private Expression _impactPosSecondLine;
-        private Expression _impactPosThirdLine;
-
-        private Expression _impactNegFirstLine;
-        private Expression _impactNegSecondLine;
-        private Expression _impactNegThirdLine;
+        private Expression _impactFirstLine;
+        private Expression _impactSecondLine;
+        private Expression _impactThirdLine;
 
 
-        public double evalImpactPosFirstLine(double theta)
+        public double evalImpactFirstLine(double theta)
         {
             _parameters["theta"] = theta;
             _parameters["phi1"] = evalPhi1(theta);
@@ -939,9 +917,9 @@ namespace BipedRobot
             _parameters["ddphi2"] = evalDphi2(theta);
             _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosFirstLine).RealValue;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactFirstLine).RealValue;
         }
-        public double evalImpactPosSecondLine(double theta)
+        public double evalImpactSecondLine(double theta)
         {
             _parameters["theta"] = theta;
             _parameters["phi1"] = evalPhi1(theta);
@@ -954,9 +932,9 @@ namespace BipedRobot
             _parameters["ddphi2"] = evalDphi2(theta);
             _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosSecondLine).RealValue;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactSecondLine).RealValue;
         }
-        public double evalImpactPosThirdLine(double theta)
+        public double evalImpactThirdLine(double theta)
         {
             _parameters["theta"] = theta;
             _parameters["phi1"] = evalPhi1(theta);
@@ -969,119 +947,40 @@ namespace BipedRobot
             _parameters["ddphi2"] = evalDphi2(theta);
             _parameters["ddphi3"] = evalDphi3(theta);
 
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactPosThirdLine).RealValue;
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactThirdLine).RealValue;
         }
 
-        public double evalImpactNegFirstLine(double theta)
-        {
-            _parameters["theta"] = theta;
-            _parameters["phi1"] = evalPhi1(theta);
-            _parameters["phi2"] = evalPhi2(theta);
-            _parameters["phi3"] = evalPhi3(theta);
-            _parameters["dphi1"] = evalDphi1(theta);
-            _parameters["dphi2"] = evalDphi2(theta);
-            _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
-
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegFirstLine).RealValue;
-        }
-        public double evalImpactNegSecondLine(double theta)
-        {
-            _parameters["theta"] = theta;
-            _parameters["phi1"] = evalPhi1(theta);
-            _parameters["phi2"] = evalPhi2(theta);
-            _parameters["phi3"] = evalPhi3(theta);
-            _parameters["dphi1"] = evalDphi1(theta);
-            _parameters["dphi2"] = evalDphi2(theta);
-            _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegSecondLine).RealValue;
-        }
-        public double evalImpactNegThirdLine(double theta)
-        {
-            _parameters["theta"] = theta;
-            _parameters["phi1"] = evalPhi1(theta);
-            _parameters["phi2"] = evalPhi2(theta);
-            _parameters["phi3"] = evalPhi3(theta);
-            _parameters["dphi1"] = evalDphi1(theta);
-            _parameters["dphi2"] = evalDphi2(theta);
-            _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
-
-            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _impactNegThirdLine).RealValue;
-        }
-
-        public Expression impactPosFirstLine
+        public Expression impactFirstLine
         {
             get
             {
-                return _impactPosFirstLine;
+                return _impactFirstLine;
             }
             set
             {
-                _impactPosFirstLine = value;
+                _impactFirstLine = value;
             }
         }
-        public Expression impactPosSecondLine
+        public Expression impactSecondLine
         {
             get
             {
-                return _impactPosSecondLine;
+                return _impactSecondLine;
             }
             set
             {
-                _impactPosSecondLine = value;
+                _impactSecondLine = value;
             }
         }
-        public Expression impactPosThirdLine
+        public Expression impactThirdLine
         {
             get
             {
-                return _impactPosThirdLine;
+                return _impactThirdLine;
             }
             set
             {
-                _impactPosThirdLine = value;
-            }
-        }
-
-        public Expression impactNegFirstLine
-        {
-            get
-            {
-                return _impactNegFirstLine;
-            }
-            set
-            {
-                _impactNegFirstLine = value;
-            }
-        }
-        public Expression impactNegSecondLine
-        {
-            get
-            {
-                return _impactNegSecondLine;
-            }
-            set
-            {
-                _impactNegSecondLine = value;
-            }
-        }
-        public Expression impactNegThirdLine
-        {
-            get
-            {
-                return _impactNegThirdLine;
-            }
-            set
-            {
-                _impactNegThirdLine = value;
+                _impactThirdLine = value;
             }
         }
         #endregion
@@ -1193,15 +1092,15 @@ namespace BipedRobot
 
         public double impactFirstLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.evalImpactNegFirstLine(thetaEnd)/_vhc.evalImpactPosFirstLine(thetaStart);
+            return _vhc.evalImpactFirstLine(thetaEnd)/_vhc.evalDphi1(thetaStart);
         }
         public double impactSecondLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.evalImpactNegSecondLine(thetaEnd)/ _vhc.evalImpactPosSecondLine(thetaStart);
+            return _vhc.evalImpactSecondLine(thetaEnd)/_vhc.evalDphi2(thetaStart);
         }
         public double impactThirdLine(double thetaStart, double thetaEnd)
         {
-            return _vhc.evalImpactNegThirdLine(thetaEnd)/ _vhc.evalImpactPosThirdLine(thetaStart);
+            return _vhc.evalImpactThirdLine(thetaEnd)/_vhc.evalDphi3(thetaStart);
         }
 
     }

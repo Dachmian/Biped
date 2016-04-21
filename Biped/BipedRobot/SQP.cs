@@ -173,48 +173,31 @@ namespace BipedRobot
             torque2End = Structure.Substitute("dthetaSquared", "dthetaTSquared", torque2End);
             torque2End = Structure.Substitute("ddtheta", "ddthetaT", torque2End);
 
-            Expression impactPosFirstLine = vhc.impactPosFirstLine;
-            impactPosFirstLine = Structure.Substitute("phi1", vhc.phi1, impactPosFirstLine);
-            impactPosFirstLine = Structure.Substitute("phi3", vhc.phi3, impactPosFirstLine);
-            impactPosFirstLine = Structure.Substitute("dphi1", vhc.dphi1, impactPosFirstLine);
-            impactPosFirstLine = Structure.Substitute("dphi3", vhc.dphi3, impactPosFirstLine);
-            impactPosFirstLine = Structure.Substitute("theta", "0", impactPosFirstLine);
+            Expression impactFirstLine = vhc.impactFirstLine;
+            impactFirstLine = Structure.Substitute("phi1", vhc.phi1, impactFirstLine);
+            impactFirstLine = Structure.Substitute("phi2", vhc.phi2, impactFirstLine);
+            impactFirstLine = Structure.Substitute("phi3", vhc.phi3, impactFirstLine);
+            impactFirstLine = Structure.Substitute("dphi1", vhc.dphi1, impactFirstLine);
+            impactFirstLine = Structure.Substitute("dphi3", vhc.dphi3, impactFirstLine);
+            impactFirstLine = Structure.Substitute("theta", "1", impactFirstLine);
 
-            Expression impactPosSecondLine = vhc.impactPosSecondLine;
-            impactPosSecondLine = Structure.Substitute("phi2", vhc.phi2, impactPosSecondLine);
-            impactPosSecondLine = Structure.Substitute("phi3", vhc.phi3, impactPosSecondLine);
-            impactPosSecondLine = Structure.Substitute("dphi1", vhc.dphi1, impactPosSecondLine);
-            impactPosSecondLine = Structure.Substitute("dphi2", vhc.dphi2, impactPosSecondLine);
-            impactPosSecondLine = Structure.Substitute("theta", "0", impactPosSecondLine);
+            Expression impactSecondLine = vhc.impactSecondLine;
+            impactSecondLine = Structure.Substitute("phi1", vhc.phi1, impactSecondLine);
+            impactSecondLine = Structure.Substitute("phi2", vhc.phi2, impactSecondLine);
+            impactSecondLine = Structure.Substitute("phi3", vhc.phi3, impactSecondLine);
+            impactSecondLine = Structure.Substitute("dphi1", vhc.dphi1, impactSecondLine);
+            impactSecondLine = Structure.Substitute("dphi2", vhc.dphi2, impactSecondLine);
+            impactSecondLine = Structure.Substitute("dphi3", vhc.dphi3, impactSecondLine);
+            impactSecondLine = Structure.Substitute("theta", "1", impactSecondLine);
 
-            Expression impactPosThirdLine = vhc.impactPosThirdLine;
-            impactPosThirdLine = Structure.Substitute("phi1", vhc.phi1, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("phi2", vhc.phi2, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("phi3", vhc.phi3, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("dphi1", vhc.dphi1, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("dphi2", vhc.dphi2, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("dphi3", vhc.dphi3, impactPosThirdLine);
-            impactPosThirdLine = Structure.Substitute("theta", "0", impactPosThirdLine);
-
-            Expression impactNegFirstLine = vhc.impactNegFirstLine;
-            impactNegFirstLine = Structure.Substitute("dphi1", vhc.dphi1, impactNegFirstLine);
-            impactNegFirstLine = Structure.Substitute("theta", "1", impactNegFirstLine);
-
-            Expression impactNegSecondLine = vhc.impactNegSecondLine;
-            impactNegSecondLine = Structure.Substitute("phi1", vhc.phi1, impactNegSecondLine);
-            impactNegSecondLine = Structure.Substitute("phi2", vhc.phi2, impactNegSecondLine);
-            impactNegSecondLine = Structure.Substitute("dphi1", vhc.dphi1, impactNegSecondLine);
-            impactNegSecondLine = Structure.Substitute("dphi2", vhc.dphi2, impactNegSecondLine);
-            impactNegSecondLine = Structure.Substitute("theta", "1", impactNegSecondLine);
-
-            Expression impactNegThirdLine = vhc.impactNegThirdLine;
-            impactNegThirdLine = Structure.Substitute("phi1", vhc.phi1, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("phi2", vhc.phi2, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("phi3", vhc.phi3, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("dphi1", vhc.dphi1, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("dphi2", vhc.dphi2, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("dphi3", vhc.dphi3, impactNegThirdLine);
-            impactNegThirdLine = Structure.Substitute("theta", "1", impactNegThirdLine);
+            Expression impactThirdLine = vhc.impactThirdLine;
+            impactThirdLine = Structure.Substitute("phi1", vhc.phi1, impactThirdLine);
+            impactThirdLine = Structure.Substitute("phi2", vhc.phi2, impactThirdLine);
+            impactThirdLine = Structure.Substitute("phi3", vhc.phi3, impactThirdLine);
+            impactThirdLine = Structure.Substitute("dphi1", vhc.dphi1, impactThirdLine);
+            impactThirdLine = Structure.Substitute("dphi2", vhc.dphi2, impactThirdLine);
+            impactThirdLine = Structure.Substitute("dphi3", vhc.dphi3, impactThirdLine);
+            impactThirdLine = Structure.Substitute("theta", "1", impactThirdLine);
 
             
             Expression phi1Start = vhc.phi1;
@@ -233,7 +216,7 @@ namespace BipedRobot
             phi3End = Structure.Substitute("theta", "1", phi3End);
 
 
-            _impact = impactNegFirstLine / impactPosFirstLine;
+            _impact = impactFirstLine;
             //normalisere. gange med 0 gir -1. phi1 starter med å være negativ. phi3 starter med å være positiv
             //_eqConstraint1 = (phi1End + phi1Start);
             //_eqConstraint2 = (phi2End - phi2Start);
@@ -701,8 +684,8 @@ namespace BipedRobot
 
             _performanceIndex = Expression.Abs((alpha1 * ddtheta + beta1 * dthetaSquared + gamma1) * vhc.dphi1 + (alpha3 * ddtheta + beta3 * dthetaSquared + gamma3) * vhc.dphi3);
 
-            _ineqConstraint3 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegSecondLine / vhc.impactPosSecondLine;
-            _ineqConstraint4 = vhc.impactNegFirstLine / vhc.impactPosFirstLine - vhc.impactNegThirdLine / vhc.impactPosThirdLine;
+            _ineqConstraint3 = vhc.impactFirstLine - vhc.impactSecondLine;
+            _ineqConstraint4 = vhc.impactFirstLine - vhc.impactThirdLine;
 
 
             _lagrangian = _performanceIndex - "lambda1" * _ineqConstraint1 - "lambda2" * _ineqConstraint2 - "lambda3" * _ineqConstraint3 - "lambda4" * _ineqConstraint4;
