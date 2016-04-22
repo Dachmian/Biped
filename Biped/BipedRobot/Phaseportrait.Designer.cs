@@ -1,6 +1,6 @@
 ﻿namespace BipedRobot
 {
-    partial class graph
+    partial class Phaseportrait
     {
         /// <summary>
         /// Required designer variable.
@@ -31,8 +31,6 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.dynamicsChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).BeginInit();
@@ -44,45 +42,36 @@
             this.dynamicsChart.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.dynamicsChart.Legends.Add(legend1);
-            this.dynamicsChart.Location = new System.Drawing.Point(12, 12);
+            this.dynamicsChart.Location = new System.Drawing.Point(64, 23);
             this.dynamicsChart.Name = "dynamicsChart";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
-            series1.Name = "q1";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "q2";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "q3";
+            series1.Name = "dtheta";
             this.dynamicsChart.Series.Add(series1);
-            this.dynamicsChart.Series.Add(series2);
-            this.dynamicsChart.Series.Add(series3);
             this.dynamicsChart.Size = new System.Drawing.Size(704, 488);
-            this.dynamicsChart.TabIndex = 0;
+            this.dynamicsChart.TabIndex = 1;
             this.dynamicsChart.Text = "chart1";
-            this.dynamicsChart.Click += new System.EventHandler(this.dynamicsChart_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(609, 506);
+            this.button1.Location = new System.Drawing.Point(661, 526);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(107, 36);
-            this.button1.TabIndex = 1;
+            this.button1.TabIndex = 2;
             this.button1.Text = "Plot";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // graph
+            // Phaseportrait
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(728, 588);
+            this.ClientSize = new System.Drawing.Size(874, 624);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dynamicsChart);
-            this.Name = "graph";
-            this.Text = "graph";
-            this.Load += new System.EventHandler(this.graph_Load);
+            this.Name = "Phaseportrait";
+            this.Text = "Phaseportrait";
+            this.Load += new System.EventHandler(this.Phaseportrait_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).EndInit();
             this.ResumeLayout(false);
 

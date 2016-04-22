@@ -134,12 +134,19 @@ namespace BipedRobot{
 
 
             string[] parameters = File.ReadAllLines(@"../../../parameters.txt");
+
+            double dtheta0 = Convert.ToDouble(File.ReadAllLines(@"../../../dtheta0.txt")[0]);
+            double dthetaT = Convert.ToDouble(File.ReadAllLines(@"../../../dthetaT.txt")[0]);
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                Console.WriteLine(parameters[i]);
+            }
             Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
             gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
 
             for (int i = 0; i < 4; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[4 - 1 - i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
 
             }
             gait.vhc.phi1Parameters = tuple.Item1;
@@ -148,7 +155,7 @@ namespace BipedRobot{
             gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
             for (int i = 4; i < 8; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[12 - 1 - i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
 
             }
             gait.vhc.phi2Parameters = tuple.Item1;
@@ -157,7 +164,7 @@ namespace BipedRobot{
             gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
             for (int i = 8; i < 12; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[20 - 1 - i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
 
             }
             gait.vhc.phi3Parameters = tuple.Item1;
@@ -169,28 +176,34 @@ namespace BipedRobot{
             gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
             gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
             gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
-            //Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            //Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            //Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
 
-            Console.WriteLine(gait.vhc.evalAlpha(0.75));
-            Console.WriteLine(gait.vhc.evalBeta(0.75));
-            Console.WriteLine(gait.vhc.evalGamma(0.75));
-            Console.WriteLine("");
-            Console.WriteLine(gait.vhc.evalPhi1(0.75));
-            Console.WriteLine(gait.vhc.evalPhi2(0.75));
-            Console.WriteLine(gait.vhc.evalPhi3(0.75));
-            Console.WriteLine("");
-            Console.WriteLine(gait.vhc.evalDphi1(0.75));
-            Console.WriteLine(gait.vhc.evalDphi2(0.75));
-            Console.WriteLine(gait.vhc.evalDphi3(0.75));
-            Console.WriteLine("");
-            Console.WriteLine(gait.vhc.evalDdphi1(0.75));
-            Console.WriteLine(gait.vhc.evalDdphi2(0.75));
-            Console.WriteLine(gait.vhc.evalDdphi3(0.75));
-            //gaitSearch.setAndVerifyParameters(ref gait);
-            //Console.WriteLine(gait.gaitParam.dtheta0);
-            //Console.WriteLine(gait.gaitParam.dthetaT);
+
+
+
+            Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            double[,] THETA = evalDthetaConstraint(gait, Math.Pow(dtheta0, 2), Math.Pow(dthetaT, 2));
+
+            Phaseportrait plot = new Phaseportrait(THETA);
+        }
+
+        public static double[,] evalDthetaConstraint(BRgait gait, double dtheta0Squared, double dthetaTSquared)
+        {
+            double[,] firstIntegral = RiemannSum.calculateFirstIntegral(gait.vhc.evalTwoTimesBetaDividedByAlpha);
+            double[,] secondIntegral = RiemannSum.calculateSecondIntegral(gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral);
+
+            int len = secondIntegral.Length / secondIntegral.Rank;
+
+
+            
+            double[,] THETA = new double[len,2];
+            for (int i = 1; i < len; i++)
+            {
+                THETA[i, 0] = secondIntegral[i, 0];
+                THETA[i, 1] = -secondIntegral[i, 1] + Math.Exp(-firstIntegral[i, 1]) * dtheta0Squared;
+            }
+            return THETA;
         }
     }
 

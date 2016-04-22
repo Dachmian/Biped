@@ -75,7 +75,7 @@ namespace BipedRobot
             Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += "P"+i.ToString()+" * " + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P"+i.ToString()+" * " + "(theta^" + (i) + ")" + "+";
                 parameters.Add("P" + i.ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
@@ -89,7 +89,7 @@ namespace BipedRobot
             Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (i) + ")" + "+";
                 parameters.Add("P" + (i + _numControlPoints).ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
@@ -103,7 +103,7 @@ namespace BipedRobot
             Dictionary<string, FloatingPoint> parameters = new Dictionary<string, FloatingPoint>();
             for (int i = 0; i < valueVector.Count; i++)
             {
-                str += "P" + (i + 2*_numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i) + ")" + "+";
+                str += "P" + (i + 2*_numControlPoints).ToString() + "*" + "(theta^" + (i) + ")" + "+";
                 parameters.Add("P" + (i + 2*_numControlPoints).ToString(), (FloatingPoint)valueVector[i]);
             }
             str += "0";
@@ -115,9 +115,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
-            for (int i = 0; i < valueVector.Count-1; i++)
+            for (int i = 1; i < valueVector.Count; i++)
             {
-                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (i).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (i-1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -127,9 +127,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
-            for (int i = 0; i < valueVector.Count - 1; i++)
+            for (int i = 1; i < valueVector.Count; i++)
             {
-                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (i).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (i-1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -139,9 +139,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
-            for (int i = 0; i < valueVector.Count - 1; i++)
+            for (int i = 1; i < valueVector.Count; i++)
             {
-                str += (_numControlPoints - 1 - i).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 1) + ")" + "+";
+                str += (i).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (i-1) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -152,9 +152,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q1controlpoints;
-            for (int i = 0; i < valueVector.Count - 2; i++)
+            for (int i = 2; i < valueVector.Count; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((i) * (i - 1)).ToString() + "*" + "P" + i.ToString() + "*" + "(theta^" + (i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -164,9 +164,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q2controlpoints;
-            for (int i = 0; i < valueVector.Count - 2; i++)
+            for (int i = 2; i < valueVector.Count; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((i) * (i - 1)).ToString() + "*" + "P" + (i + _numControlPoints).ToString() + "*" + "(theta^" + (i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");
@@ -176,9 +176,9 @@ namespace BipedRobot
         {
             string str = "";
             Vector<double> valueVector = _bezierMatrix * _q3controlpoints;
-            for (int i = 0; i < valueVector.Count - 2; i++)
+            for (int i = 2; i < valueVector.Count; i++)
             {
-                str += ((_numControlPoints - 1 - i) * (_numControlPoints - 1 - i - 1)).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (_numControlPoints - 1 - i - 2) + ")" + "+";
+                str += ((i) * (i - 1)).ToString() + "*" + "P" + (i + 2 * _numControlPoints).ToString() + "*" + "(theta^" + (i - 2) + ")" + "+";
             }
             str += "0";
             str = str.Replace("+-", "-");

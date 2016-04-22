@@ -408,16 +408,16 @@ namespace BipedRobot
             _alpha = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../beta.txt");
-            temp = fs.ReadLine();
-            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _beta = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
 
             fs = new StreamReader(@"../../../gamma.txt");
             temp = fs.ReadLine();
             //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
             _gamma = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../beta.txt");
+            temp = fs.ReadLine();
+            _beta = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
             fs = new StreamReader(@"../../../impactFirstLine.txt");
@@ -845,9 +845,9 @@ namespace BipedRobot
             _parameters["dphi1"] = evalDphi1(theta);
             _parameters["dphi2"] = evalDphi2(theta);
             _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta).RealValue;
         }
@@ -896,6 +896,40 @@ namespace BipedRobot
             _parameters["ddphi3"] = evalDphi3(theta);
 
             return (2 * (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue / (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue);
+        }
+
+        public Expression alpha
+        {
+            get
+            {
+                return _alpha;
+            }
+            set
+            {
+                _alpha = value;
+            }
+        }
+        public Expression beta
+        {
+            get
+            {
+                return _beta;
+            }
+            set
+            {
+                _beta = value;
+            }
+        }
+        public Expression gamma
+        {
+            get
+            {
+                return _gamma;
+            }
+            set
+            {
+                _gamma = value;
+            }
         }
         #endregion
         #region impacts

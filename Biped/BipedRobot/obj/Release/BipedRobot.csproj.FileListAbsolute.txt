@@ -51,3 +51,4 @@ C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobo
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.exe
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.pdb
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.csprojResolveAssemblyReference.cache
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Phaseportrait.resources

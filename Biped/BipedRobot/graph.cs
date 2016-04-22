@@ -51,5 +51,10 @@ namespace BipedRobot
             dynamicsChart.Series["q3"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             dynamicsChart.Series["q3"].Color = Color.Blue;
         }
+
+        private void dynamicsChart_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
