@@ -33,9 +33,15 @@
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.dynamicsChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.zeroDynamics = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zeroDynamics)).BeginInit();
             this.SuspendLayout();
             // 
             // dynamicsChart
@@ -73,17 +79,46 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(1165, 506);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(107, 36);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Plot";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // zeroDynamics
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.zeroDynamics.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.zeroDynamics.Legends.Add(legend2);
+            this.zeroDynamics.Location = new System.Drawing.Point(722, 12);
+            this.zeroDynamics.Name = "zeroDynamics";
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "phaseportrait";
+            this.zeroDynamics.Series.Add(series4);
+            this.zeroDynamics.Size = new System.Drawing.Size(563, 488);
+            this.zeroDynamics.TabIndex = 3;
+            this.zeroDynamics.Text = "chart1";
+            // 
             // graph
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(728, 588);
+            this.ClientSize = new System.Drawing.Size(1297, 588);
+            this.Controls.Add(this.zeroDynamics);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dynamicsChart);
             this.Name = "graph";
             this.Text = "graph";
             this.Load += new System.EventHandler(this.graph_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zeroDynamics)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -92,5 +127,7 @@
 
         private System.Windows.Forms.DataVisualization.Charting.Chart dynamicsChart;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart zeroDynamics;
     }
 }

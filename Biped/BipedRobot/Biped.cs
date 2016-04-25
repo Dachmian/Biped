@@ -17,6 +17,7 @@ namespace BipedRobot
     {
         private BRParameters _param;
         private BRData _data;
+        private BRReducedData _reducedData;
         private List<BRgait> _gaits;
 
         public Biped(string fileName)
@@ -47,6 +48,18 @@ namespace BipedRobot
             set
             {
                 _data = value;
+            }
+        }
+
+        public BRReducedData reducedData
+        {
+            get
+            {
+                return _reducedData;
+            }
+            set
+            {
+                _reducedData = value;
             }
         }
 
@@ -615,8 +628,8 @@ namespace BipedRobot
 
         public static double rhs1D(Vector<double> THETA, coefficientFunction alpha, coefficientFunction beta, coefficientFunction gamma)
         {
-            //vector with 1 = theta, 2 = dtheta^2
-            double ddtheta = (-beta(THETA[0]) * THETA[1] - gamma(THETA[0])) / alpha(THETA[0]);
+            //vector with 1 = theta, 2 = dtheta
+            double ddtheta = (-beta(THETA[0]) * Math.Pow(THETA[1], 2) - gamma(THETA[0])) / alpha(THETA[0]);
             return ddtheta;
         }
 

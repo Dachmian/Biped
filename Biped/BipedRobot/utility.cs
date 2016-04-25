@@ -207,13 +207,14 @@ namespace BipedRobot{
 
         public static BRReducedData run(BRVHC vhc, Vector<double> integrationStart, Vector<double> integrationEnd)
         {
-            BRReducedData data = new BRReducedData(0.01, integrationStart);
+            BRReducedData data = new BRReducedData(0.001, Vector<double>.Build.Dense(new double[] { integrationStart[0], integrationStart[1],
+                BRReducedDynamics.rhs1D(integrationStart, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma)}));
             int i = 0;
             Vector<double> oneStep = integrationStart;
-			while (true){
-				oneStep = rk4 (oneStep, data.timestep, vhc);
+            while (true){
+				oneStep = rk4(oneStep, data.timestep, vhc);
                 double ddtheta = BRReducedDynamics.rhs1D(oneStep, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
-				data.RES [i+1] = new Tuple<Vector<double>,double> (Vector<double>.Build.Dense(new []{oneStep[0], oneStep[1], ddtheta}), i*data.timestep);
+				data.RES.Add(new Tuple<Vector<double>,double> (Vector<double>.Build.Dense(new double[]{oneStep[0], oneStep[1], ddtheta}), i*data.timestep));
 				if (oneStep[0] > integrationEnd[0]) {
 					break;
 				}
@@ -227,13 +228,13 @@ namespace BipedRobot{
             double halfdx = 0.5 * dx;
             double sixth = 1.0 / 6.0;
 
-            Vector<double> k0 = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0, 0 });
+            Vector<double> k0 = Vector<double>.Build.Dense(new double[] { 0, 0});
             Vector<double> k1 = dx * BRReducedDynamics.rhs2D(THETA + k0, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
             Vector<double> k2 = dx * BRReducedDynamics.rhs2D(THETA + k1 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
             Vector<double> k3 = dx * BRReducedDynamics.rhs2D(THETA + k2 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
             Vector<double> k4 = dx * BRReducedDynamics.rhs2D(THETA + k3 * dx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
 
-            return + sixth * (k1 + 2 * k2 + 2 * k3 + k4);
+            return THETA + sixth * (k1 + 2 * k2 + 2 * k3 + k4);
         }
     }
 

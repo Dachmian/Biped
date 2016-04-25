@@ -56,5 +56,27 @@ namespace BipedRobot
         {
 
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < _biped.reducedData.RES.Count; i++)
+            {
+                double theta = _biped.reducedData.RES[i].Item1[0];
+                double dtheta = _biped.reducedData.RES[i].Item1[1];
+                double ddtheta = _biped.reducedData.RES[i].Item1[2];
+                double time = _biped.reducedData.RES[i].Item2;
+                zeroDynamics.Series["phaseportrait"].Points.AddXY(theta, dtheta);
+                //zeroDynamics.Series["dtheta"].Points.AddXY(time, dtheta);
+                //zeroDynamics.Series["ddtheta"].Points.AddXY(time, ddtheta);
+            }
+            zeroDynamics.Series["phaseportrait"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            zeroDynamics.Series["phaseportrait"].Color = Color.Red;
+
+            //zeroDynamics.Series["dtheta"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            //zeroDynamics.Series["dtheta"].Color = Color.Black;
+
+            //zeroDynamics.Series["ddtheta"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            //zeroDynamics.Series["ddtheta"].Color = Color.Blue;
+        }
     }
 }
