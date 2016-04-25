@@ -230,7 +230,6 @@ namespace BipedRobot
             for(int i = 0;i < b/ dx; i++)
             {
                 val += f(theta) * dx;
-
                 RES[i, 0] = theta;
                 RES[i, 1] = val;
 
@@ -248,7 +247,7 @@ namespace BipedRobot
             for (int i = 0; i < b / dx; i++)
             {
 
-                val += Math.Exp(firstIntegralVal[i, 1]) * f(theta);
+                val += (Math.Exp(firstIntegralVal[i, 1]) * f(theta))*dx;
 
                 RES[i, 0] = theta;
                 RES[i, 1] = val;

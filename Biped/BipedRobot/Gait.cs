@@ -830,9 +830,9 @@ namespace BipedRobot
             _parameters["dphi1"] = evalDphi1(theta);
             _parameters["dphi2"] = evalDphi2(theta);
             _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue;
         }
@@ -860,9 +860,9 @@ namespace BipedRobot
             _parameters["dphi1"] = evalDphi1(theta);
             _parameters["dphi2"] = evalDphi2(theta);
             _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue;
         }
@@ -876,9 +876,9 @@ namespace BipedRobot
             _parameters["dphi1"] = evalDphi1(theta);
             _parameters["dphi2"] = evalDphi2(theta);
             _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (2 * (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta).RealValue / (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue);
         }
@@ -891,9 +891,9 @@ namespace BipedRobot
             _parameters["dphi1"] = evalDphi1(theta);
             _parameters["dphi2"] = evalDphi2(theta);
             _parameters["dphi3"] = evalDphi3(theta);
-            _parameters["ddphi1"] = evalDphi1(theta);
-            _parameters["ddphi2"] = evalDphi2(theta);
-            _parameters["ddphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (2 * (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue / (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha).RealValue);
         }

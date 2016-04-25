@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MathNet.Symbolics;
 using System.IO;
+using System.Globalization;
 
 namespace BipedRobot{
     static class Program{
@@ -134,9 +135,8 @@ namespace BipedRobot{
 
 
             string[] parameters = File.ReadAllLines(@"../../../parameters.txt");
-
-            double dtheta0 = Convert.ToDouble(File.ReadAllLines(@"../../../dtheta0.txt")[0]);
-            double dthetaT = Convert.ToDouble(File.ReadAllLines(@"../../../dthetaT.txt")[0]);
+            double dtheta0 = Convert.ToDouble(File.ReadAllLines(@"../../../dtheta0.txt")[0], CultureInfo.InvariantCulture);
+            double dthetaT = Convert.ToDouble(File.ReadAllLines(@"../../../dthetaT.txt")[0], CultureInfo.InvariantCulture);
             for (int i = 0; i < parameters.Length; i++)
             {
                 Console.WriteLine(parameters[i]);
@@ -146,7 +146,7 @@ namespace BipedRobot{
 
             for (int i = 0; i < 4; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
 
             }
             gait.vhc.phi1Parameters = tuple.Item1;
@@ -155,7 +155,7 @@ namespace BipedRobot{
             gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
             for (int i = 4; i < 8; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
 
             }
             gait.vhc.phi2Parameters = tuple.Item1;
@@ -164,7 +164,7 @@ namespace BipedRobot{
             gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
             for (int i = 8; i < 12; i++)
             {
-                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i]);
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
 
             }
             gait.vhc.phi3Parameters = tuple.Item1;
@@ -180,9 +180,11 @@ namespace BipedRobot{
 
 
 
-            Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-            Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+            //Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+
+
             double[,] THETA = evalDthetaConstraint(gait, Math.Pow(dtheta0, 2), Math.Pow(dthetaT, 2));
 
             Phaseportrait plot = new Phaseportrait(THETA);
@@ -193,11 +195,15 @@ namespace BipedRobot{
             double[,] firstIntegral = RiemannSum.calculateFirstIntegral(gait.vhc.evalTwoTimesBetaDividedByAlpha);
             double[,] secondIntegral = RiemannSum.calculateSecondIntegral(gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral);
 
+            double endi1 = firstIntegral[499, 1];
+            double endi2 = secondIntegral[499, 1];
             int len = secondIntegral.Length / secondIntegral.Rank;
 
 
             
             double[,] THETA = new double[len,2];
+            THETA[0, 0] = 0;
+            THETA[0, 1] = dtheta0Squared;
             for (int i = 1; i < len; i++)
             {
                 THETA[i, 0] = secondIntegral[i, 0];
