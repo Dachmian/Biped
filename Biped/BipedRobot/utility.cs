@@ -219,6 +219,10 @@ namespace BipedRobot{
 					break;
 				}
                 i++;
+                if(i > 10000)
+                {
+                    break;
+                }
             }
             return data;
         }

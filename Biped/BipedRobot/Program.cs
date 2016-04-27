@@ -16,8 +16,8 @@ namespace BipedRobot{
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //gaitSearch.run(ref biped);
-            //findGaitsManually(biped);
-            findGaitsHere(biped);
+            findGaitsManually(biped);
+            //findGaitsHere(biped);
             
         }
 
@@ -135,6 +135,24 @@ namespace BipedRobot{
             biped.reducedData = data;
 
             graph graph = new graph(biped);
+            //using (StreamWriter file =
+            //                            new System.IO.StreamWriter(@"../../../foundgaits.txt", true))
+            //{
+            //    file.WriteLine(gait.vhc.phi1Parameters["P0"].RealValue);
+            //    file.WriteLine(gait.vhc.phi1Parameters["P1"].RealValue);
+            //    file.WriteLine(gait.vhc.phi1Parameters["P2"].RealValue);
+            //    file.WriteLine(gait.vhc.phi1Parameters["P3"].RealValue);
+            //    file.WriteLine(gait.vhc.phi2Parameters["P4"].RealValue);
+            //    file.WriteLine(gait.vhc.phi2Parameters["P5"].RealValue);
+            //    file.WriteLine(gait.vhc.phi2Parameters["P6"].RealValue);
+            //    file.WriteLine(gait.vhc.phi2Parameters["P7"].RealValue);
+            //    file.WriteLine(gait.vhc.phi3Parameters["P8"].RealValue);
+            //    file.WriteLine(gait.vhc.phi3Parameters["P9"].RealValue);
+            //    file.WriteLine(gait.vhc.phi3Parameters["P10"].RealValue);
+            //    file.WriteLine(gait.vhc.phi3Parameters["P11"].RealValue);
+            //    file.WriteLine("NEW GAIT");
+            //    file.WriteLine("");
+            //}
         }
 
         public static double[,] evalDthetaConstraint(BRgait gait, double dtheta0Squared, double dthetaTSquared)
