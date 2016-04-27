@@ -257,14 +257,13 @@ namespace BipedRobot{
             Matrix<double> A = (pLHS*pmatrix).Solve(pRHS);
             Matrix<double> paramMatrix = Matrix<double>.Build.DenseOfArray(new double[,]
             {
-                {2,3,-2,-3,0,0 },
-                {2,3,0,0,-2,-3 },
-                {0,0,2,3,-2,-3 },
-                {1,1,0,0,0,0 },
-                {0,0,1,1,0,0 },
-                {0,0,0,0,1,1 },
+                {3,0,0,-2,-3 },
+                {0,2,3,-2,-3 },
+                {1,0,0,0,0 },
+                {0,1,1,0,0 },
+                {0,0,0,1,1 },
             });
-            Vector<double> b = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0, 0 });
+            Vector<double> b = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0});
             Vector<double> qdotminus = Vector<double>.Build.Dense(new double[] { 0, 0, 0 });
             Vector<double> param = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0, 0 });
             double anglepsi = (15.70*Math.PI)/32;
@@ -311,93 +310,105 @@ namespace BipedRobot{
                         qdotminus[1] = enddq2;
                         qdotminus[2] = enddq3;
                         Vector<double> qdotplus = A * qdotminus;
-                        paramMatrix[0, 2] = -2 * (enddq1 / enddq2);
-                        paramMatrix[0, 3] = -3 * (enddq1 / enddq2);
-                        paramMatrix[1, 0] = 2 * (enddq3 / enddq1);
-                        paramMatrix[1, 1] = 3 * (enddq3 / enddq1);
-                        paramMatrix[2, 4] = -2 * (enddq2 / enddq3);
-                        paramMatrix[2, 5] = -3 * (enddq2 / enddq3);
-                        p1 = -0.05;
-                        while(p1 > -2)
+                        paramMatrix[0, 0] = 3 * (enddq3 / enddq1);
+                        paramMatrix[1, 3] = -2 * (enddq2 / enddq3);
+                        paramMatrix[1, 4] = -3 * (enddq2 / enddq3);
+
+                        //check sign of qdotplus1 to make sure thetadot0 >0
+                        int signP1 = Math.Sign(qdotplus[1]);
+                        p1 = signP1 * 0.05;
+                        while(p1 > -2 && p1 <2)
                         {
-                            p5 = qdotplus[1] / qdotplus[0] * p1;
-                            p9 = qdotplus[2] / qdotplus[0] * p1;
-
-                            b[0] = -p1 + (enddq1 / enddq2) * p5;
-                            b[1] = -p1* (enddq3 / enddq1) + p9;
-                            b[2] = -p5 + (enddq2 / enddq3) * p9;
-                            b[3] = -2 * p0 - p1;
-                            b[4] = -p5;
-                            b[5] = -2 * p8 - p9;
-                            param = paramMatrix.Solve(b);
-                            //param = paramMatrix.Inverse() * b;
-                            gait.vhc.phi1Parameters["P1"] = p1;
-                            gait.vhc.phi1Parameters["P2"] = param[0];
-                            gait.vhc.phi1Parameters["P3"] = param[1];
-
-                            gait.vhc.phi2Parameters["P5"] = p5;
-                            gait.vhc.phi2Parameters["P6"] = param[2];
-                            gait.vhc.phi2Parameters["P7"] = param[3];
-
-                            gait.vhc.phi3Parameters["P9"] = p9;
-                            gait.vhc.phi3Parameters["P10"] = param[4];
-                            gait.vhc.phi3Parameters["P11"] = param[5];
-
-                            bool neg = true;
-                            for(int i = 0; i < 40; i++)
+                            //check sign of qdotminus1 to make sure p1+2p2+3p3 < 0
+                            int signP2 = Math.Sign(qdotminus[1]);
+                            if (signP2 < 0)
                             {
-                                double val = gait.vhc.evalAlpha(0.025 * i);
-                                Console.WriteLine("");
-                                if (val > 1)
-                                {
-                                    neg = false;
-                                    break;
-                                }
+                                p2 = 6 * p0 + 2 * p1 + 0.05;
                             }
-                            if (neg)
+                            else
                             {
-                                using (StreamWriter file =
-                                    new System.IO.StreamWriter(@"../../../foundgaits.txt", true))
-                                {
-                                    file.WriteLine(anglepsi);
-                                    file.WriteLine(enddq2);
-                                    file.WriteLine(p1);
-                                    file.WriteLine(a);
-                                    file.WriteLine(p0);
-                                    file.WriteLine(p1);
-                                    file.WriteLine(param[0]);
-                                    file.WriteLine(param[1]);
-                                    file.WriteLine(p4);
-                                    file.WriteLine(p5);
-                                    file.WriteLine(param[2]);
-                                    file.WriteLine(param[3]);
-                                    file.WriteLine(p8);
-                                    file.WriteLine(p9);
-                                    file.WriteLine(param[4]);
-                                    file.WriteLine(param[5]);
-
-                                    Console.WriteLine(anglepsi);
-                                    Console.WriteLine(enddq2);
-                                    Console.WriteLine(p1);
-                                    Console.WriteLine(a);
-                                    Console.WriteLine(p0);
-                                    Console.WriteLine(p1);
-                                    Console.WriteLine(param[0]);
-                                    Console.WriteLine(param[1]);
-                                    Console.WriteLine(p4);
-                                    Console.WriteLine(p5);
-                                    Console.WriteLine(param[2]);
-                                    Console.WriteLine(param[3]);
-                                    Console.WriteLine(p8);
-                                    Console.WriteLine(p9);
-                                    Console.WriteLine(param[4]);
-                                    Console.WriteLine(param[5]);
-                                    Console.WriteLine("");
-
-                                }
+                                p2 = 6 * p0 + 2 * p1 - 0.05;
                             }
+                            while (p2 < (6 * p0 + 2 * p1 +2) && p2 > (6 * p0 + 2 * p1-2))
+                            {
+                                p5 = qdotplus[1] / qdotplus[0] * p1;
+                                p9 = qdotplus[2] / qdotplus[0] * p1;
+                            
 
-                            p1 -= 0.05;
+                                b[0] = (-p1 - 2 * p2) * (enddq3 / enddq1) + p9;
+                                b[1] = -p5 + (enddq2 / enddq3) * p9;
+                                b[2] = -2 * p0 - p1 - p2;
+                                b[3] = -p5;
+                                b[4] = -2 * p8 - p9;
+                                param = paramMatrix.Solve(b);
+                                //param = paramMatrix.Inverse() * b;
+                                gait.vhc.phi1Parameters["P1"] = p1;
+                                gait.vhc.phi1Parameters["P2"] = p2;
+                                gait.vhc.phi1Parameters["P3"] = param[0];
+
+                                gait.vhc.phi2Parameters["P5"] = p5;
+                                gait.vhc.phi2Parameters["P6"] = param[1];
+                                gait.vhc.phi2Parameters["P7"] = param[2];
+
+                                gait.vhc.phi3Parameters["P9"] = p9;
+                                gait.vhc.phi3Parameters["P10"] = param[3];
+                                gait.vhc.phi3Parameters["P11"] = param[4];
+
+                                bool neg = true;
+                                for(int i = 0; i < 40; i++)
+                                {
+                                    double val = gait.vhc.evalAlpha(0.025 * i);
+                                    if (val > 2)
+                                    {
+                                        neg = false;
+                                        break;
+                                    }
+                                }
+                                if (neg)
+                                {
+                                    using (StreamWriter file =
+                                        new System.IO.StreamWriter(@"../../../foundgaits.txt", true))
+                                    {
+                                        file.WriteLine(anglepsi);
+                                        file.WriteLine(enddq2);
+                                        file.WriteLine(p1);
+                                        file.WriteLine(a);
+                                        file.WriteLine(p0);
+                                        file.WriteLine(p1);
+                                        file.WriteLine(param[0]);
+                                        file.WriteLine(param[1]);
+                                        file.WriteLine(p4);
+                                        file.WriteLine(p5);
+                                        file.WriteLine(param[2]);
+                                        file.WriteLine(param[3]);
+                                        file.WriteLine(p8);
+                                        file.WriteLine(p9);
+                                        file.WriteLine(param[4]);
+                                        file.WriteLine(param[5]);
+
+                                        Console.WriteLine(anglepsi);
+                                        Console.WriteLine(enddq2);
+                                        Console.WriteLine(p1);
+                                        Console.WriteLine(a);
+                                        Console.WriteLine(p0);
+                                        Console.WriteLine(p1);
+                                        Console.WriteLine(param[0]);
+                                        Console.WriteLine(param[1]);
+                                        Console.WriteLine(p4);
+                                        Console.WriteLine(p5);
+                                        Console.WriteLine(param[2]);
+                                        Console.WriteLine(param[3]);
+                                        Console.WriteLine(p8);
+                                        Console.WriteLine(p9);
+                                        Console.WriteLine(param[4]);
+                                        Console.WriteLine(param[5]);
+                                        Console.WriteLine("");
+
+                                    }
+                                }
+                                p2 = p2 - (signP2 * 0.05);
+                            }
+                            p1 = p1 + (signP1 * 0.05);
                         }
 
                         if(enddq2 == -0.01)
