@@ -29,8 +29,8 @@ namespace BipedRobot
         {
             for (int i = 0; i < _THETA.Length/_THETA.Rank; i++)
             {
-                double theta = _THETA[i, 0];
-                double dtheta = _THETA[i, 1];
+                double theta = _THETA[0, i];
+                double dtheta = _THETA[1, i];
                 dynamicsChart.Series["dtheta"].Points.AddXY(theta, Math.Sqrt(dtheta));
             }
             dynamicsChart.Series["dtheta"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;

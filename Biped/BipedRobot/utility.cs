@@ -203,8 +203,6 @@ namespace BipedRobot{
 
     public static class integrationReducedDynamics
     {
-        
-
         public static BRReducedData run(BRVHC vhc, Vector<double> integrationStart, Vector<double> integrationEnd)
         {
             BRReducedData data = new BRReducedData(0.001, Vector<double>.Build.Dense(new double[] { integrationStart[0], integrationStart[1],
@@ -267,6 +265,26 @@ namespace BipedRobot{
             }
             return THETA;
         }
+    }
+
+    public static class calculateTorques
+    {
+        public static BRTorques run(BRVHC vhc, BRReducedData data)
+        {
+            BRTorques torques = new BRTorques(data.RES.Count);
+
+            for (int i = 0; i < data.RES.Count; i++)
+            {
+                torques.torque1[i] = vhc.evalAlpha1(data.RES[i].Item1[0]) * data.RES[i].Item1[2] + vhc.evalBeta1(data.RES[i].Item1[0]) * Math.Pow(data.RES[i].Item1[1],2) + vhc.evalGamma1(data.RES[i].Item1[0]);
+                torques.torque2[i] = vhc.evalAlpha3(data.RES[i].Item1[0]) * data.RES[i].Item1[2] + vhc.evalBeta3(data.RES[i].Item1[0]) * Math.Pow(data.RES[i].Item1[1], 2) + vhc.evalGamma3(data.RES[i].Item1[0]);
+                torques.theta[i] = data.RES[i].Item1[0];
+                torques.dtheta[i] = data.RES[i].Item1[1];
+                torques.ddtheta[i] = data.RES[i].Item1[2];
+
+            }
+            return torques;
+        }
+
     }
 
     public static class plotting

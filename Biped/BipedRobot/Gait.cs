@@ -420,6 +420,36 @@ namespace BipedRobot
             _beta = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
+            fs = new StreamReader(@"../../../alpha1.txt");
+            temp = fs.ReadLine();
+            _alpha1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../beta1.txt");
+            temp = fs.ReadLine();
+            _beta1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../gamma1.txt");
+            temp = fs.ReadLine();
+            _gamma1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../alpha3.txt");
+            temp = fs.ReadLine();
+            _alpha3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../beta3.txt");
+            temp = fs.ReadLine();
+            _beta3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
+            fs = new StreamReader(@"../../../gamma3.txt");
+            temp = fs.ReadLine();
+            _gamma3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
+            fs.Close();
+
             fs = new StreamReader(@"../../../impactFirstLine.txt");
             temp = fs.ReadLine();
             temp = temp.Replace("0.2e1","2").Replace("pow","");
@@ -821,6 +851,14 @@ namespace BipedRobot
         private Expression _beta;
         private Expression _gamma;
 
+        private Expression _alpha1;
+        private Expression _beta1;
+        private Expression _gamma1;
+
+        private Expression _alpha3;
+        private Expression _beta3;
+        private Expression _gamma3;
+
         public double evalAlpha(double theta)
         {
             _parameters["theta"] = theta;
@@ -865,6 +903,98 @@ namespace BipedRobot
             _parameters["ddphi3"] = evalDdphi3(theta);
 
             return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma).RealValue;
+        }
+
+        public double evalAlpha1(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha1).RealValue;
+        }
+        public double evalBeta1(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta1).RealValue;
+        }
+        public double evalGamma1(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma1).RealValue;
+        }
+
+        public double evalAlpha3(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _alpha3).RealValue;
+        }
+        public double evalBeta3(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _beta3).RealValue;
+        }
+        public double evalGamma3(double theta)
+        {
+            _parameters["theta"] = theta;
+            _parameters["phi1"] = evalPhi1(theta);
+            _parameters["phi2"] = evalPhi2(theta);
+            _parameters["phi3"] = evalPhi3(theta);
+            _parameters["dphi1"] = evalDphi1(theta);
+            _parameters["dphi2"] = evalDphi2(theta);
+            _parameters["dphi3"] = evalDphi3(theta);
+            _parameters["ddphi1"] = evalDdphi1(theta);
+            _parameters["ddphi2"] = evalDdphi2(theta);
+            _parameters["ddphi3"] = evalDdphi3(theta);
+
+            return (double)MathNet.Symbolics.Evaluate.Evaluate(_parameters, _gamma3).RealValue;
         }
 
         public double evalTwoTimesBetaDividedByAlpha(double theta)
@@ -929,6 +1059,74 @@ namespace BipedRobot
             set
             {
                 _gamma = value;
+            }
+        }
+
+        public Expression alpha1
+        {
+            get
+            {
+                return _alpha1;
+            }
+            set
+            {
+                _alpha1 = value;
+            }
+        }
+        public Expression beta1
+        {
+            get
+            {
+                return _beta1;
+            }
+            set
+            {
+                _beta1 = value;
+            }
+        }
+        public Expression gamma1
+        {
+            get
+            {
+                return _gamma1;
+            }
+            set
+            {
+                _gamma1 = value;
+            }
+        }
+
+        public Expression alpha3
+        {
+            get
+            {
+                return _alpha3;
+            }
+            set
+            {
+                _alpha3 = value;
+            }
+        }
+        public Expression beta3
+        {
+            get
+            {
+                return _beta3;
+            }
+            set
+            {
+                _beta3 = value;
+            }
+        }
+        public Expression gamma3
+        {
+            get
+            {
+                return _gamma3;
+            }
+            set
+            {
+                _gamma3 = value;
             }
         }
         #endregion

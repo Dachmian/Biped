@@ -639,4 +639,79 @@ namespace BipedRobot
             return rhs2D;
         }
     }
+
+    public class BRTorques
+    {
+        private double[] _torque1;
+        private double[] _torque2;
+        private double[] _theta;
+        private double[] _dtheta;
+        private double[] _ddtheta;
+
+        public BRTorques(int len)
+        {
+            _torque1 = new double[len];
+            _torque2 = new double[len];
+            _theta = new double[len];
+            _dtheta = new double[len];
+            _ddtheta = new double[len];
+        }
+
+        public double[] torque1
+        {
+            get
+            {
+                return _torque1;
+            }
+            set
+            {
+                _torque1 = value;
+            }
+        }
+        public double[] torque2
+        {
+            get
+            {
+                return _torque2;
+            }
+            set
+            {
+                _torque2 = value;
+            }
+        }
+        public double[] theta
+        {
+            get
+            {
+                return _theta;
+            }
+            set
+            {
+                _theta = value;
+            }
+        }
+        public double[] dtheta
+        {
+            get
+            {
+                return _dtheta;
+            }
+            set
+            {
+                _dtheta = value;
+            }
+        }
+        public double[] ddtheta
+        {
+            get
+            {
+                return _ddtheta;
+            }
+            set
+            {
+                _ddtheta = value;
+            }
+        }
+
+    }
 }

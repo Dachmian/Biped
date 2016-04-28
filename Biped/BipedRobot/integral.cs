@@ -220,37 +220,47 @@ namespace BipedRobot
     {
         public delegate double integralFunc(double theta);
 
-        public static double[,] calculateFirstIntegral(integralFunc f)
+        public static double[][] calculateFirstIntegral(integralFunc f)
         {
-            double dx = 0.002;
+            double dx = 0.01;
             double b = 1;
             double val = 0;
             double theta = 0;
-            double[,] RES = new double[(int)(b / dx), 2];
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 3; i++)
+            {
+                RES[i] = new double[(int)(b / dx)];
+            }
+
             for(int i = 0;i < b/ dx; i++)
             {
                 val += f(theta) * dx;
-                RES[i, 0] = theta;
-                RES[i, 1] = val;
+                RES[0][i] = theta;
+                RES[1][i] = val;
 
                 theta += dx;
             }
             return RES;
         }
-        public static double[,] calculateSecondIntegral(integralFunc f, double[,] firstIntegralVal)
+        public static double[][] calculateSecondIntegral(integralFunc f, double[] firstIntegral)
         {
-            double dx = 0.002;
+            double dx = 0.01;
             double b = 1;
             double val = 0;
+            double lastVal = firstIntegral[firstIntegral.Length - 1];
             double theta = 0;
-            double[,] RES = new double[(int)(b / dx), 2];
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 3; i++)
+            {
+                RES[i] = new double[(int)(b / dx)];
+            }
             for (int i = 0; i < b / dx; i++)
             {
 
-                val += (Math.Exp(firstIntegralVal[i, 1]) * f(theta))*dx;
+                val += (Math.Exp(lastVal - firstIntegral[i]) * f(theta))*dx;
 
-                RES[i, 0] = theta;
-                RES[i, 1] = val;
+                RES[0][i] = theta;
+                RES[1][i] = val;
 
                 theta += dx;
             }
