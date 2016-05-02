@@ -217,7 +217,7 @@ namespace BipedRobot{
 					break;
 				}
                 i++;
-                if(i > 10000)
+                if(i > 20000)
                 {
                     break;
                 }
@@ -228,15 +228,15 @@ namespace BipedRobot{
         public static Vector<double> rk4(Vector<double> THETA, double dx, BRVHC vhc)
         {
             double halfdx = 0.5 * dx;
-            double sixth = 1.0 / 6.0;
+            double sixthdx = 1.0 / 6.0 * dx;
 
             Vector<double> k0 = Vector<double>.Build.Dense(new double[] { 0, 0});
-            Vector<double> k1 = dx * BRReducedDynamics.rhs2D(THETA + k0, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
-            Vector<double> k2 = dx * BRReducedDynamics.rhs2D(THETA + k1 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
-            Vector<double> k3 = dx * BRReducedDynamics.rhs2D(THETA + k2 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
-            Vector<double> k4 = dx * BRReducedDynamics.rhs2D(THETA + k3 * dx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k1 = BRReducedDynamics.rhs2D(THETA + k0, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k2 = BRReducedDynamics.rhs2D(THETA + k1 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k3 = BRReducedDynamics.rhs2D(THETA + k2 * halfdx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
+            Vector<double> k4 = BRReducedDynamics.rhs2D(THETA + k3 * dx, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma);
 
-            return THETA + sixth * (k1 + 2 * k2 + 2 * k3 + k4);
+            return THETA + sixthdx * (k1 + 2 * k2 + 2 * k3 + k4);
         }
     }
 

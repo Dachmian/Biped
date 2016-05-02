@@ -31,7 +31,7 @@ namespace BipedRobot
             {
                 double theta = _THETA[0, i];
                 double dtheta = _THETA[1, i];
-                dynamicsChart.Series["dtheta"].Points.AddXY(theta, Math.Sqrt(dtheta));
+                dynamicsChart.Series["dtheta"].Points.AddXY(theta, dtheta);
             }
             dynamicsChart.Series["dtheta"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             dynamicsChart.Series["dtheta"].Color = Color.Red;

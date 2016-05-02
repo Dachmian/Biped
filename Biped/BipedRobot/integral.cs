@@ -227,12 +227,12 @@ namespace BipedRobot
             double val = 0;
             double theta = 0;
             double[][] RES = new double[2][];
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
-                RES[i] = new double[(int)(b / dx)];
+                RES[i] = new double[(int)(b / dx) + 1];
             }
 
-            for(int i = 0;i < b/ dx; i++)
+            for(int i = 0;i <= b/ dx; i++)
             {
                 val += f(theta) * dx;
                 RES[0][i] = theta;
@@ -250,14 +250,14 @@ namespace BipedRobot
             double lastVal = firstIntegral[firstIntegral.Length - 1];
             double theta = 0;
             double[][] RES = new double[2][];
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
-                RES[i] = new double[(int)(b / dx)];
+                RES[i] = new double[(int)(b / dx) + 1];
             }
-            for (int i = 0; i < b / dx; i++)
+            for (int i = 0; i <= b / dx; i++)
             {
 
-                val += (Math.Exp(lastVal - firstIntegral[i]) * f(theta))*dx;
+                val += (Math.Exp(-(lastVal - firstIntegral[i])) * f(theta))*dx;
 
                 RES[0][i] = theta;
                 RES[1][i] = val;
@@ -266,5 +266,56 @@ namespace BipedRobot
             }
             return RES;
         }
+    }
+    public static class TrapezoidalSum
+    {
+        public delegate double integralFunc(double theta);
+
+        public static double[][] calculateFirstIntegral(integralFunc f)
+        {
+            double dx = 0.01;
+            double b = 1;
+            double val = 0;
+            double theta = 0;
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 2; i++)
+            {
+                RES[i] = new double[(int)(b / dx) + 1];
+            }
+            for (int i = 0; i < b / dx; i++)
+            {
+                val += dx * (f(theta) + f(theta + dx)) / 2;
+                RES[0][i] = theta;
+                RES[1][i] = val;
+
+                theta += dx;
+            }
+            return RES;
+        }
+        public static double[][] calculateSecondIntegral(integralFunc f, double[] firstIntegral)
+        {
+            double dx = 0.01;
+            double b = 1;
+            double val = 0;
+            double lastVal = firstIntegral[firstIntegral.Length - 1];
+            double theta = 0;
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 2; i++)
+            {
+                RES[i] = new double[(int)(b / dx) + 1];
+            }
+            for (int i = 0; i < b / dx; i++)
+            {
+
+                val += dx * (Math.Exp(-(lastVal - firstIntegral[i])) * f(theta) + Math.Exp(-(lastVal - firstIntegral[i + 1])) * f(theta + dx)) / 2;
+
+                RES[0][i] = theta;
+                RES[1][i] = val;
+
+                theta += dx;
+            }
+            return RES;
+        }
+
     }
 }

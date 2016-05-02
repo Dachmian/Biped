@@ -222,7 +222,7 @@ namespace BipedRobot
             Console.WriteLine("ute av impact");
             setVHC(ref gait, numberOfPoints);
             //begin search
-            AGS ags = new AGS(gait);
+            AGS ags = new AGS(gait, numberOfPoints);
             //ags.runAnalytical(gait);
             ags.runNumerical(gait);
 
@@ -1314,7 +1314,7 @@ namespace BipedRobot
 
         public double secondIntegral(double theta)
         {
-            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, 0, theta, 64);
+            double a = MathNet.Numerics.Integration.GaussLegendreRule.Integrate(firstIntegral, 1, theta, 100);
             return Math.Exp(a) * _vhc.evalTwoTimesGammaDividedByAlpha(theta);
         }
         public double secondIntegralPartial(double theta)
