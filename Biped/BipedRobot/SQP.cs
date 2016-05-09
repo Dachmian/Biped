@@ -750,7 +750,7 @@ namespace BipedRobot
                     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
                 };
                 double[] bl = new double[] { -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, -1.0E+25, 2*_q1End, 0, 2*_q3End, 0, 0, 0.2, -1.0E+25 };
-                double[] bu = new double[] { 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 2*_q1End, 0, 2*_q3End, 0, 0, 50, -0.4 };
+                double[] bu = new double[] { 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 1.0E+25, 2*_q1End, 0, 2*_q3End, 0, 0, 50, -0.1 };
                 double[] ccon = new double[ncnln];
                 double[,] cjac = new double[ncnln, n];
                 double[] clamda = new double[nclin + ncnln + n];
@@ -762,7 +762,7 @@ namespace BipedRobot
                 E04.e04wdOptions options = new E04.e04wdOptions();
                 options.Set("Print file = 6");
                 options.Set("Derivative level = 0");
-                options.Set("Major Step limit = 0.00000000001");
+                //options.Set("Major Step limit = 0.00000000001");
                 options.Set("Major Feasibility Tolerance = 1.0E-6");
                 options.Set("Function precision = 1.0E-5");
 
@@ -813,7 +813,7 @@ namespace BipedRobot
 
             }
             double[] values = evalTorques();
-            objf = Math.Pow(values[2], 2) + Math.Pow(values[3], 2);// +Math.Pow(values[2], 2) + Math.Pow(values[3], 2);
+            objf = Math.Pow(values[0], 2) + Math.Pow(values[1], 2);// +Math.Pow(values[0], 2) + Math.Pow(values[1], 2);
             mode = 0;
 
         }
