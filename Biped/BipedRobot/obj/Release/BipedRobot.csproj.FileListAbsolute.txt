@@ -52,3 +52,17 @@ C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobo
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.pdb
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.csprojResolveAssemblyReference.cache
 C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Phaseportrait.resources
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\alglibnet2.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsec.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsecCS.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FSharp.Core.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.FSharp.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Symbolics.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\NagLibrary64.dll
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsec.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FParsecCS.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\FSharp.Core.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Numerics.FSharp.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Symbolics.xml
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Phaseportrait.resources
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.TorquesGraph.resources

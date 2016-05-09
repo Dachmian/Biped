@@ -65,3 +65,4 @@ C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobo
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\alglibnet2.dll
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Debug\BipedRobot.Phaseportrait.resources
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Debug\BipedRobot.TorquesGraph.resources
+C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Debug\NagLibrary64.dll

@@ -222,9 +222,6 @@ namespace BipedRobot
             Console.WriteLine("ute av impact");
             setVHC(ref gait, numberOfPoints);
             //begin search
-            AGS ags = new AGS(gait, numberOfPoints);
-            //ags.runAnalytical(gait);
-            ags.runNumerical(gait);
 
 
 
@@ -394,77 +391,70 @@ namespace BipedRobot
 
             StreamReader fs = null;
             string temp;
-            
 
-            fs = new StreamReader(@"../../../ddq3.txt");
-            temp = fs.ReadLine();
-            //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
-            _ddq3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
-            fs.Close();
-
-            fs = new StreamReader(@"../../../alpha.txt");
+            fs = new StreamReader(@"../../../../alpha.txt");
             temp = fs.ReadLine();
             //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
             _alpha = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
 
-            fs = new StreamReader(@"../../../gamma.txt");
+            fs = new StreamReader(@"../../../../gamma.txt");
             temp = fs.ReadLine();
             //temp = temp.Replace("tan", "Tan").Replace("cos", "Cos").Replace("sin", "Sin").Replace("pow", "Pow");
             _gamma = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../beta.txt");
+            fs = new StreamReader(@"../../../../beta.txt");
             temp = fs.ReadLine();
             _beta = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../alpha1.txt");
+            fs = new StreamReader(@"../../../../alpha1.txt");
             temp = fs.ReadLine();
             _alpha1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../beta1.txt");
+            fs = new StreamReader(@"../../../../beta1.txt");
             temp = fs.ReadLine();
             _beta1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../gamma1.txt");
+            fs = new StreamReader(@"../../../../gamma1.txt");
             temp = fs.ReadLine();
             _gamma1 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../alpha3.txt");
+            fs = new StreamReader(@"../../../../alpha3.txt");
             temp = fs.ReadLine();
             _alpha3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../beta3.txt");
+            fs = new StreamReader(@"../../../../beta3.txt");
             temp = fs.ReadLine();
             _beta3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../gamma3.txt");
+            fs = new StreamReader(@"../../../../gamma3.txt");
             temp = fs.ReadLine();
             _gamma3 = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactFirstLine.txt");
+            fs = new StreamReader(@"../../../../impactFirstLine.txt");
             temp = fs.ReadLine();
             temp = temp.Replace("0.2e1","2").Replace("pow","");
             temp = temp.Replace(", 2)", ")^2");
             _impactFirstLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactSecondLine.txt");
+            fs = new StreamReader(@"../../../../impactSecondLine.txt");
             temp = fs.ReadLine();
             temp = temp.Replace("0.2e1", "2").Replace("pow", "");
             temp = temp.Replace(", 2)", ")^2");
             _impactSecondLine = Infix.ParseOrUndefined(temp.Substring(temp.IndexOf('=') + 1, temp.LastIndexOf(';') - temp.IndexOf('=') - 1));
             fs.Close();
 
-            fs = new StreamReader(@"../../../impactThirdLine.txt");
+            fs = new StreamReader(@"../../../../impactThirdLine.txt");
             temp = fs.ReadLine();
             temp = temp.Replace("0.2e1", "2").Replace("pow", "");
             temp = temp.Replace(", 2)", ")^2");
@@ -1269,8 +1259,8 @@ namespace BipedRobot
 
         public BRgait(BRParameters param, int numberOfPoints)
         {
-            _vhc = new BRVHC(param, numberOfPoints);
             _gaitParam = new BRGaitParameters(numberOfPoints);
+            _vhc = new BRVHC(param, numberOfPoints);
         }
         public BRVHC vhc
         {

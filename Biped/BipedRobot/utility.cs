@@ -287,6 +287,27 @@ namespace BipedRobot{
 
     }
 
+    public static class calculateTorques2
+    {
+        public static BRTorques run(BRVHC vhc, double[,] data)
+        {
+            BRTorques torques = new BRTorques(data.Length / data.Rank);
+            double ddtheta;
+            for (int i = 0; i < data.Length / data.Rank; i++)
+            {
+                ddtheta = (-vhc.evalBeta(data[0, i]) * Math.Pow(data[1, i], 2) - vhc.evalGamma(data[0, i])) / vhc.evalAlpha(data[0, i]);
+                torques.torque1[i] = vhc.evalAlpha1(data[0, i]) * ddtheta + vhc.evalBeta1(data[0, i]) * Math.Pow(data[1, i], 2) + vhc.evalGamma1(data[0, i]);
+                torques.torque2[i] = vhc.evalAlpha3(data[0, i]) * ddtheta + vhc.evalBeta3(data[0, i]) * Math.Pow(data[1, i], 2) + vhc.evalGamma3(data[0, i]);
+                torques.theta[i] = data[0, i];
+                torques.dtheta[i] = data[1, i];
+                torques.ddtheta[i] = ddtheta;
+
+            }
+            return torques;
+        }
+
+    }
+
     public static class plotting
     {
         public static void plotStates(Biped biped)
