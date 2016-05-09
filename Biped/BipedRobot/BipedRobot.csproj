@@ -11,6 +11,7 @@
     <AssemblyName>BipedRobot</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -110,7 +110,7 @@
     </Reference>
     <Reference Include="NagLibrary64, Version=2.0.1.6, Culture=neutral, PublicKeyToken=5b3c2ab9ec29ceba, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\NAG\DTW02\bin64\NagLibrary64.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\NAG\DTW02\NagLibrary64.dll</HintPath>
     </Reference>
     <Reference Include="NCalc">
       <HintPath>..\..\..\..\..\..\..\..\Windows\NCalc.dll</HintPath>

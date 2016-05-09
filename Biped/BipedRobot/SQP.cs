@@ -762,7 +762,7 @@ namespace BipedRobot
                 E04.e04wdOptions options = new E04.e04wdOptions();
                 options.Set("Print file = 6");
                 options.Set("Derivative level = 0");
-                //options.Set("Major Step limit = 0.00000000001");
+                options.Set("Major Step limit = 0.00000000001");
                 options.Set("Major Feasibility Tolerance = 1.0E-6");
                 options.Set("Function precision = 1.0E-5");
 

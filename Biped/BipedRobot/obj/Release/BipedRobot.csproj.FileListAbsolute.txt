@@ -66,3 +66,4 @@ C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRo
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\bin\Release\MathNet.Symbolics.xml
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.Phaseportrait.resources
 C:\Users\dachmian\Documents\Visual Studio 2012\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.TorquesGraph.resources
+C:\Users\damira\Documents\Visual Studio 2015\Projects\BipedRobot\Biped\BipedRobot\obj\Release\BipedRobot.TorquesGraph.resources
