@@ -258,7 +258,7 @@ namespace BipedRobot
 
             }
             double[] values = evalTorques();
-            objf = Math.Pow(values[0], 2) + Math.Pow(values[1], 2) + Math.Pow(values[2], 2) + Math.Pow(values[3], 2);
+            objf = Math.Pow(values[2], 2) + Math.Pow(values[3], 2) +Math.Pow(values[0], 2) + Math.Pow(values[1], 2);
             mode = 0;
            
         }
