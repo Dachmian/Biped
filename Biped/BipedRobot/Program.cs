@@ -180,11 +180,11 @@ namespace BipedRobot{
 
             Phaseportrait plot = new Phaseportrait(THETA);
 
-            //BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
-            //    Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
-            //biped.reducedData = data;
+            BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
+                Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
+            biped.reducedData = data;
 
-            //graph graph = new graph(biped);
+            graph graph = new graph(biped);
 
 
             using (StreamWriter file =
