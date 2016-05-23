@@ -89,6 +89,9 @@ namespace BipedRobot{
             BRTorques torques = calculateTorques2.run(gait.vhc, THETA);
             TorquesGraph torquesGraph = new TorquesGraph(torques);
 
+
+            TrajectoryGraph trajectory = new TrajectoryGraph(gait, THETA);
+
             Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
@@ -160,8 +163,8 @@ namespace BipedRobot{
             //SLSQPFifthOrderTorqueEquality slSQPTE = new SLSQPFifthOrderTorqueEquality(gait, numberOfPoints);
             //slSQPTE.runNumericalSLSQP();
 
-            //SLSQPFifthOrderTorque slSQPT = new SLSQPFifthOrderTorque(gait, numberOfPoints);
-            //slSQPT.runNumericalSLSQP();
+            SLSQPFifthOrderTorque slSQPT = new SLSQPFifthOrderTorque(gait, numberOfPoints);
+            slSQPT.runNumericalSLSQP();
 
             //SLSQPFifthOrder slSQP = new SLSQPFifthOrder(gait, numberOfPoints);
             //slSQP.runNumericalSLSQP();
@@ -172,8 +175,8 @@ namespace BipedRobot{
             //SLSQPFifthOrderDtheta slSQPTD = new SLSQPFifthOrderDtheta(gait, numberOfPoints);
             //slSQPTD.runNumericalSLSQP();
 
-            SLSQPFifthOrderTorqueConstraint slSQPTD = new SLSQPFifthOrderTorqueConstraint(gait, numberOfPoints);
-            slSQPTD.runNumericalSLSQP();
+            //SLSQPFifthOrderTorqueConstraint slSQPTD = new SLSQPFifthOrderTorqueConstraint(gait, numberOfPoints);
+            //slSQPTD.runNumericalSLSQP();
             double[,] THETA = evalDthetaConstraint(gait, ref dtheta0Squared, ref dthetaTSquared);
 
             Phaseportrait plot = new Phaseportrait(THETA);

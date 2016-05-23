@@ -4086,11 +4086,11 @@ namespace BipedRobot
                 solver.SetMinObjective(objfun);
                 solver.AddLessOrEqualZeroConstraint(alphaMaxConstraint, 0.001);
                 solver.AddLessOrEqualZeroConstraint(dthetaConstraint, 0.001);
-                solver.AddEqualZeroConstraint(impactConstraint1, 0.001);
-                solver.AddEqualZeroConstraint(impactConstraint2, 0.001);
-                solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
-                solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
-                solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                solver.AddEqualZeroConstraint(impactConstraint1, 0.00001);
+                solver.AddEqualZeroConstraint(impactConstraint2, 0.00001);
+                solver.AddEqualZeroConstraint(geometryConstraint1, 0.00001);
+                solver.AddEqualZeroConstraint(geometryConstraint2, 0.00001);
+                solver.AddEqualZeroConstraint(geometryConstraint3, 0.00001);
                 solver.AddEqualZeroConstraint(torqueConstraint, 0.00001);
 
                 double? finalScore;

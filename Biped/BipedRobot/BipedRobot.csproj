@@ -115,7 +115,8 @@
     <Reference Include="NCalc">
       <HintPath>..\..\..\..\..\..\..\..\Windows\NCalc.dll</HintPath>
     </Reference>
-    <Reference Include="NLoptNet">
+    <Reference Include="NLoptNet, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NLoptNet.1.0.2.0\lib\net45\NLoptNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -158,6 +159,12 @@
     <Compile Include="TorquesGraph.Designer.cs">
       <DependentUpon>TorquesGraph.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrajectoryGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrajectoryGraph.Designer.cs">
+      <DependentUpon>TrajectoryGraph.cs</DependentUpon>
+    </Compile>
     <Compile Include="utility.cs" />
     <EmbeddedResource Include="graph.resx">
       <DependentUpon>graph.cs</DependentUpon>
@@ -176,6 +183,9 @@
     </Compile>
     <EmbeddedResource Include="TorquesGraph.resx">
       <DependentUpon>TorquesGraph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrajectoryGraph.resx">
+      <DependentUpon>TrajectoryGraph.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
