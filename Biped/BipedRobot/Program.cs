@@ -13,7 +13,7 @@ namespace BipedRobot{
     static class Program{
         static void Main(string[] args)
         {
-            Biped biped = new Biped (@"../../../basic_randomized_set.xml");
+            Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             findGaitsManually(biped);
@@ -80,11 +80,11 @@ namespace BipedRobot{
 
             Phaseportrait plot = new Phaseportrait(THETA);
 
-            //BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
-            //    Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
-            //biped.reducedData = data;
+            BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
+                Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
+            biped.reducedData = data;
 
-            //graph graph = new graph(biped);
+            graph graph = new graph(biped);
 
             BRTorques torques = calculateTorques2.run(gait.vhc, THETA);
             TorquesGraph torquesGraph = new TorquesGraph(torques);
@@ -156,26 +156,24 @@ namespace BipedRobot{
             double dtheta0Squared = 0;// Math.Pow(dtheta0, 2);
             double dthetaTSquared = 0;// Math.Pow(dthetaT, 2);
 
-            
 
-            SQPFifthOrder ags = new SQPFifthOrder(gait, numberOfPoints);
-            double[] param = ags.runNumericalSQP();
-            int len = param.Length / 3;
-            for (int i = 0; i < len; i++)
-            {
-                gait.vhc.phi1Parameters["P" + (i + 1).ToString()] = param[i];
+            //SLSQPFifthOrderTorqueEquality slSQPTE = new SLSQPFifthOrderTorqueEquality(gait, numberOfPoints);
+            //slSQPTE.runNumericalSLSQP();
 
-            }
-            for (int i = len; i < 2 * len; i++)
-            {
-                gait.vhc.phi2Parameters["P" + (i + 2).ToString()] = param[i];
+            //SLSQPFifthOrderTorque slSQPT = new SLSQPFifthOrderTorque(gait, numberOfPoints);
+            //slSQPT.runNumericalSLSQP();
 
-            }
-            for (int i = 2 * len; i < 3 * len; i++)
-            {
-                gait.vhc.phi3Parameters["P" + (i + 3).ToString()] = param[i];
+            //SLSQPFifthOrder slSQP = new SLSQPFifthOrder(gait, numberOfPoints);
+            //slSQP.runNumericalSLSQP();
 
-            }
+            //SLSQPFifthOrderTorqueDtheta slSQPTD = new SLSQPFifthOrderTorqueDtheta(gait, numberOfPoints);
+            //slSQPTD.runNumericalSLSQP();
+
+            //SLSQPFifthOrderDtheta slSQPTD = new SLSQPFifthOrderDtheta(gait, numberOfPoints);
+            //slSQPTD.runNumericalSLSQP();
+
+            SLSQPFifthOrderTorqueConstraint slSQPTD = new SLSQPFifthOrderTorqueConstraint(gait, numberOfPoints);
+            slSQPTD.runNumericalSLSQP();
             double[,] THETA = evalDthetaConstraint(gait, ref dtheta0Squared, ref dthetaTSquared);
 
             Phaseportrait plot = new Phaseportrait(THETA);
@@ -220,12 +218,12 @@ namespace BipedRobot{
 
         public static double[,] evalDthetaConstraint(BRgait gait, ref double dtheta0Squared, ref double dthetaTSquared)
         {
-            double[][] firstIntegral = RiemannMiddleSum.calculateFirstIntegral(gait.firstIntegral);
-            double firstIntegralVALUE = GaussLegendreRule.Integrate(gait.firstIntegral, 0, 1, 1000);
+            double[][] firstIntegral = TrapezoidalSum2.calculateFirstIntegral(gait.vhc.evalTwoTimesBetaDividedByAlpha, 0, 1, 200);
+            double firstIntegralVALUE = GaussLegendreRule.Integrate(gait.firstIntegral, 0, 1, 100);
             double secondIntegralVALUE = GaussLegendreRule.Integrate(gait.secondIntegral, 0, 1, 100);
-            double[][] secondIntegral = RiemannMiddleSum.calculateSecondIntegral(gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral[1]);            
+            double[][] secondIntegral = TrapezoidalSum2.calculateSecondIntegral(gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral[1], 0, 1, 200);            
             int len = firstIntegral[1].Length;
-            dthetaTSquared = (-secondIntegral[1][len - 1]) / (1 - Math.Exp(-firstIntegral[1][len - 1]) * Math.Pow(gait.impactSecondLine(0, 1), 2));
+            dthetaTSquared = (-secondIntegral[1][len - 1] * Math.Exp(firstIntegral[1][len - 1])) / (1 - Math.Exp(firstIntegral[1][len - 1]) * Math.Pow(gait.impactSecondLine(0, 1), 2));
             dtheta0Squared = dthetaTSquared * Math.Pow(gait.impactSecondLine(0, 1), 2);
             double dthetaTSquaredTest = (-secondIntegralVALUE) / (1 - Math.Exp(-firstIntegralVALUE) * Math.Pow(gait.impactSecondLine(0, 1), 2));
             double dtheta0squaredTest = dthetaTSquaredTest * Math.Pow(gait.impactSecondLine(0, 1), 2);
@@ -238,7 +236,7 @@ namespace BipedRobot{
                 for (int i = 1; i < len; i++)
                 {
                     THETA[0, i + j*len] = secondIntegral[0][i];
-                    THETA[1, i + j*len] = Math.Sqrt(-secondIntegral[1][i] + Math.Exp(-firstIntegral[1][i]) * dtheta0Squared);
+                    THETA[1, i + j*len] = Math.Sqrt(-secondIntegral[1][i] * Math.Exp(firstIntegral[1][i]) + Math.Exp(firstIntegral[1][i]) * dtheta0Squared);
                     temp = THETA[1, i];
                 }
                 dtheta0Squared = Math.Pow(gait.impactSecondLine(0, 1), 2) * Math.Pow(temp, 2);

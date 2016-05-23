@@ -1,0 +1,27 @@
+<biped_model>
+  <physical_parameters>
+    <description>a symmetric legs CAD parameters set based on ILeg frame values</description>
+    <gravitational_constant model_parameter="g">9.81</gravitational_constant>
+    <stance_leg_parameters>
+      <mass model_parameter="m1">1.898</mass>
+      <length model_parameter="L1">0.65</length>
+      <CoM_position model_parameter="l1">0.466714225501</CoM_position>
+      <inertia model_parameter="J1">0.0923051301159</inertia>
+    </stance_leg_parameters>
+    <body_parameters>
+      <mass model_parameter="m2">3.799</mass>
+      <length model_parameter="L2">1.0</length>
+      <CoM_position model_parameter="l2">0.264035535667</CoM_position>
+      <inertia model_parameter="J2">0.445050300203</inertia>
+    </body_parameters>
+    <swing_leg_parameters>
+      <mass model_parameter="m3">1.898</mass>
+      <length model_parameter="L3">0.65</length>
+      <CoM_position model_parameter="l3">0.183285774499</CoM_position>
+      <inertia model_parameter="J3">0.0923051301159</inertia>
+    </swing_leg_parameters>
+    <hips_mass_parameter>
+      <mass model_parameter="Mh">0.0</mass>
+    </hips_mass_parameter>
+  </physical_parameters>
+</biped_model>

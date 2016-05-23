@@ -635,11 +635,10 @@ namespace BipedRobot
 
         public static Vector<double> rhs2D(Vector<double> THETA, coefficientFunction alpha, coefficientFunction beta, coefficientFunction gamma)
         {
-            Vector<double> rhs2D = Vector.Build.Dense(new double[] {THETA[1] ,rhs1D(THETA, alpha, beta, gamma)});
+            Vector<double> rhs2D = Vector.Build.Dense(new double[] { THETA[1], rhs1D(THETA, alpha, beta, gamma) });
             return rhs2D;
         }
     }
-
     public class BRTorques
     {
         private double[] _torque1;

@@ -273,7 +273,7 @@ namespace BipedRobot
 
         public static double[][] calculateFirstIntegral(integralFunc f)
         {
-            double dx = 0.0025;
+            double dx = 0.001;
             double b = 1;
             double val = 0;
             double theta = 0;
@@ -294,7 +294,7 @@ namespace BipedRobot
         }
         public static double[][] calculateSecondIntegral(integralFunc f, double[] firstIntegral)
         {
-            double dx = 0.0025;
+            double dx = 0.001;
             double b = 1;
             double val = 0;
             double lastVal = firstIntegral[firstIntegral.Length - 2];
@@ -325,7 +325,7 @@ namespace BipedRobot
 
         public static double[][] calculateFirstIntegral(integralFunc f)
         {
-            double dx = 0.005;
+            double dx = 0.001;
             double b = 1;
             double val = 0;
             double theta = 0;
@@ -347,7 +347,7 @@ namespace BipedRobot
         }
         public static double[][] calculateSecondIntegral(integralFunc f, double[] firstIntegral)
         {
-            double dx = 0.005;
+            double dx = 0.001;
             int b = 1;
             double val = 0;
             double lastVal = firstIntegral[firstIntegral.Length - 1];
@@ -368,6 +368,73 @@ namespace BipedRobot
                 theta += dx;
             }
             return RES;
+        }
+    }
+
+    public static class TrapezoidalSum2
+    {
+        public delegate double integralFunc(double theta);
+
+        public static double[][] calculateFirstIntegral(integralFunc f, double intervalBegin, double intervalEnd, int numberOfPartitions)
+        {
+            double step = (intervalEnd - intervalBegin) / numberOfPartitions;
+            double offset = 0;
+            double val = 0;
+            double theta = 0;
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 2; i++)
+            {
+                RES[i] = new double[numberOfPartitions + 1];
+            }
+            RES[0][0] = theta;
+            RES[1][0] = val;
+            for (int i = 1; i <= numberOfPartitions; i++)
+            {
+                val += ((-1) * f(theta + offset) + (-1) * f(theta + offset + step)) * (step * 0.5);
+                offset += step;
+                RES[0][i] = theta + offset;
+                RES[1][i] = val;
+            }
+            return RES;
+        }
+        public static double[][] calculateSecondIntegral(integralFunc f, double[] firstIntegral, double intervalBegin, double intervalEnd, int numberOfPartitions)
+        {
+            double step = (intervalEnd - intervalBegin) / numberOfPartitions;
+            double offset = 0;
+            double val = 0;
+            double theta = 0;
+            double[][] RES = new double[2][];
+            for (int i = 0; i < 2; i++)
+            {
+                RES[i] = new double[numberOfPartitions + 1];
+            }
+            RES[0][0] = theta;
+            RES[1][0] = val;
+            for (int i = 1; i <= numberOfPartitions; i++)
+            {
+                val += (Math.Exp(-firstIntegral[i - 1]) * f(theta + offset) + Math.Exp(-firstIntegral[i]) * f(theta + offset + step)) * (step * 0.5);
+                offset += step;
+                RES[0][i] = theta + offset;
+                RES[1][i] = val;
+            }
+            return RES;
+        }
+
+        public static double IntegrateComposite(integralFunc f, double intervalBegin, double intervalEnd, int numberOfPartitions)
+        {
+
+            double step = (intervalEnd - intervalBegin) / numberOfPartitions;
+
+            double offset = step;
+            double sum = 0.5 * (f(intervalBegin) + f(intervalEnd))*step;
+            for (int i = 0; i < numberOfPartitions - 1; i++)
+            {
+                // NOTE (ruegg, 2009-01-07): Do not combine intervalBegin and offset (numerical stability!)
+                sum += f(intervalBegin + offset)*step;
+                offset += step;
+            }
+
+            return sum;
         }
     }
 }

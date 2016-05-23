@@ -52,12 +52,8 @@ namespace BipedRobot{
                 //even if mh == 0.0
                 double lH2 = l2 * m2 / (m2 + mh);
                 m2 = m2 + mh;
-                J2 = J2 + mh * Math.Pow(lH2, 2) + m2 * Math.Pow((lH2 - l2), 2);
+                J2 = J2 + mh * Math.Pow(lH2, 2) + (m2 - mh) * Math.Pow((lH2 - l2), 2);
                 l2 = lH2;
-
-                m2 = 4.25;
-                l2 = 0.58176470;
-                J2 = 2.3527534313728825;
 
                 BRParameters param = new BRParameters(description, g, m1, L1, l1, J1, m2, L2, l2, J2, m3, L3, l3, J3, mh);
                 return param;
@@ -239,6 +235,7 @@ namespace BipedRobot{
             return THETA + sixthdx * (k1 + 2 * k2 + 2 * k3 + k4);
         }
     }
+    
 
     public static class calculateReducedDynamics
     {
