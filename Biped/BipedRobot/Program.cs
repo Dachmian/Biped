@@ -16,8 +16,8 @@ namespace BipedRobot{
             Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
-            findGaitsManually(biped);
-            //test(biped);
+            //findGaitsManually(biped);
+            test(biped);
             
         }
 
@@ -95,6 +95,73 @@ namespace BipedRobot{
             Console.WriteLine(gait.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
             Console.WriteLine(gait.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
+
+            int len = THETA.Length / (THETA.Rank * 8);
+            using (StreamWriter file =
+                        new System.IO.StreamWriter(@"../../../../VALS.txt", true))
+            {
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalAlpha(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalBeta(THETA[0, i]));
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalGamma(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalAlpha1(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalBeta1(THETA[0, i]));
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalGamma1(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalAlpha3(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalBeta3(THETA[0, i]));
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(gait.vhc.evalGamma3(THETA[0, i]));
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(torques.torque1[i]);
+                }
+                file.WriteLine("");
+
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(torques.torque2[i]);
+                }
+            }
             
         }
 
@@ -163,8 +230,8 @@ namespace BipedRobot{
             //SLSQPFifthOrderTorqueEquality slSQPTE = new SLSQPFifthOrderTorqueEquality(gait, numberOfPoints);
             //slSQPTE.runNumericalSLSQP();
 
-            SLSQPFifthOrderTorque slSQPT = new SLSQPFifthOrderTorque(gait, numberOfPoints);
-            slSQPT.runNumericalSLSQP();
+            //SLSQPFifthOrderTorque slSQPT = new SLSQPFifthOrderTorque(gait, numberOfPoints);
+            //slSQPT.runNumericalSLSQP();
 
             //SLSQPFifthOrder slSQP = new SLSQPFifthOrder(gait, numberOfPoints);
             //slSQP.runNumericalSLSQP();
@@ -175,8 +242,8 @@ namespace BipedRobot{
             //SLSQPFifthOrderDtheta slSQPTD = new SLSQPFifthOrderDtheta(gait, numberOfPoints);
             //slSQPTD.runNumericalSLSQP();
 
-            //SLSQPFifthOrderTorqueConstraint slSQPTD = new SLSQPFifthOrderTorqueConstraint(gait, numberOfPoints);
-            //slSQPTD.runNumericalSLSQP();
+            SLSQPFifthOrderTorqueConstraint slSQPTD = new SLSQPFifthOrderTorqueConstraint(gait, numberOfPoints);
+            slSQPTD.runNumericalSLSQP();
             double[,] THETA = evalDthetaConstraint(gait, ref dtheta0Squared, ref dthetaTSquared);
 
             Phaseportrait plot = new Phaseportrait(THETA);
@@ -244,11 +311,36 @@ namespace BipedRobot{
                 }
                 dtheta0Squared = Math.Pow(gait.impactSecondLine(0, 1), 2) * Math.Pow(temp, 2);
             }
+            using (StreamWriter file =
+                        new System.IO.StreamWriter(@"../../../../VALS.txt", true))
+            {
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(THETA[0, i]);
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(THETA[1, i]);
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(Math.Exp(firstIntegral[1][i]));
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(secondIntegral[1][i]);
+                }
+                file.WriteLine("");
+            }
             return THETA;
         }
 
 
-        
+
+
        }
 
     
