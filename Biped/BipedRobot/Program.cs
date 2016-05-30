@@ -11,14 +11,16 @@ using System.Globalization;
 
 namespace BipedRobot{
     static class Program{
+        [STAThread]
         static void Main(string[] args)
         {
-            Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
+            MainForm mainForm = new MainForm();
+            //Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //findGaitsManually(biped);
             //test(biped);
-            XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
+            //XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
             
         }
 
