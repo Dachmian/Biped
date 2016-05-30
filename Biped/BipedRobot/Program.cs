@@ -17,7 +17,8 @@ namespace BipedRobot{
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //findGaitsManually(biped);
-            test(biped);
+            //test(biped);
+            XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
             
         }
 

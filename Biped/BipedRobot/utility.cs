@@ -10,6 +10,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics;
 using NCalc;
+using System.Globalization;
 
 namespace BipedRobot{
 
@@ -73,7 +74,18 @@ namespace BipedRobot{
             }
 
         }
+        public static void writeXMLDataToFile(string txtFileName, BRParameters parameters)
+        {
+            string m = String.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", parameters.m1, parameters.m2, parameters.m3);
+            string l = String.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", parameters.l1, parameters.l2, parameters.l3);
+            string L = String.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", parameters.L1, parameters.L2, parameters.L3);
+            string J = String.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", parameters.J1, parameters.J2, parameters.J3);
+            string etc = String.Format(CultureInfo.InvariantCulture, "{0} {1} {2}", parameters.g, parameters.mh, 0);
 
+            string[] data = { m, l, L, J, etc };
+            File.WriteAllLines(@"../../../../"+txtFileName+".txt", data);
+
+        }
 
     }
 
