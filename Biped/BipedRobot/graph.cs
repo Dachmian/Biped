@@ -28,16 +28,16 @@ namespace BipedRobot
         private void button1_Click(object sender, EventArgs e)
         {
 
-            for (int i = 0; i < _biped.data.RES.Length; i++)
+            for (int i = 0; i < _biped.simulationData.RES.Length; i++)
             {
-                if (_biped.data.RES[i] == null)
+                if (_biped.simulationData.RES[i] == null)
                 {
                     break;
                 }
-                double q1 = _biped.data.RES[i].Item1[0];
-                double q2 = _biped.data.RES[i].Item1[1];
-                double q3 = _biped.data.RES[i].Item1[2];
-                double time = _biped.data.RES[i].Item2;
+                double q1 = _biped.simulationData.RES[i].Item1[0];
+                double q2 = _biped.simulationData.RES[i].Item1[1];
+                double q3 = _biped.simulationData.RES[i].Item1[2];
+                double time = _biped.simulationData.RES[i].Item2;
                 dynamicsChart.Series["q1"].Points.AddXY(time, q1);
                 dynamicsChart.Series["q2"].Points.AddXY(time, q2);
                 dynamicsChart.Series["q3"].Points.AddXY(time, q3);
@@ -59,12 +59,12 @@ namespace BipedRobot
 
         private void button2_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < _biped.reducedData.RES.Count; i++)
+            for (int i = 0; i < _biped.reducedSimulationData.RES.Count; i++)
             {
-                double theta = _biped.reducedData.RES[i].Item1[0];
-                double dtheta = _biped.reducedData.RES[i].Item1[1];
-                double ddtheta = _biped.reducedData.RES[i].Item1[2];
-                double time = _biped.reducedData.RES[i].Item2;
+                double theta = _biped.reducedSimulationData.RES[i].Item1[0];
+                double dtheta = _biped.reducedSimulationData.RES[i].Item1[1];
+                double ddtheta = _biped.reducedSimulationData.RES[i].Item1[2];
+                double time = _biped.reducedSimulationData.RES[i].Item2;
                 zeroDynamics.Series["phaseportrait"].Points.AddXY(theta, dtheta);
                 //zeroDynamics.Series["dtheta"].Points.AddXY(time, dtheta);
                 //zeroDynamics.Series["ddtheta"].Points.AddXY(time, ddtheta);

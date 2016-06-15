@@ -113,11 +113,11 @@ namespace BipedRobot{
 			Tuple<Vector<double>,double>[] RES = new Tuple<Vector<double>, double>[time.Length];
 			RES [0] = new Tuple<Vector<double>, double>(initialConditions, time [0]);
 
-			biped.data.time = time;
-			biped.data.timestep = (time.Last()-time.First()) / time.Length;
-			biped.data.RES = RES;
-			biped.data.currentQ = Vector<double>.Build.Dense (new double[] {initialConditions[0],initialConditions[1],initialConditions[2] });
-			biped.data.currentDQ = Vector<double>.Build.Dense (new double[] {initialConditions[3],initialConditions[4],initialConditions[5] });
+			biped.simulationData.time = time;
+            biped.simulationData.timestep = (time.Last() - time.First()) / time.Length;
+            biped.simulationData.RES = RES;
+            biped.simulationData.currentQ = Vector<double>.Build.Dense(new double[] { initialConditions[0], initialConditions[1], initialConditions[2] });
+            biped.simulationData.currentDQ = Vector<double>.Build.Dense(new double[] { initialConditions[3], initialConditions[4], initialConditions[5] });
 		}
 		public static double stoppingConditionREL(Vector<double> currentState)
 		{
@@ -138,7 +138,8 @@ namespace BipedRobot{
         }
         public static void integrateUntilConditionGEO(ref Biped biped)
 		{
-			if (stoppingConditionABS (biped.data.currentQ) < 0) {
+            if (stoppingConditionABS(biped.simulationData.currentQ) < 0)
+            {
 				Console.WriteLine ("ugyldig start");
 			} else {
 				integrateWhileConditionGEO (ref biped);
@@ -148,14 +149,17 @@ namespace BipedRobot{
 		public static void integrateWhileConditionGEO(ref Biped biped)
 		{
 			Vector<double> oneStep;
-			for (int i = 0; i<biped.data.time.Length-1; i++) {
+            for (int i = 0; i < biped.simulationData.time.Length - 1; i++)
+            {
 				oneStep = rk4 (biped);
                 //oneStep = constantStep(biped);
-				
-				biped.data.RES [i+1] = new Tuple<Vector<double>,double> (oneStep, biped.data.time [i+1]);
-				biped.data.currentQ = Vector<double>.Build.Dense (new double[] {oneStep[0], oneStep[1], oneStep[2] });
-				biped.data.currentDQ = Vector<double>.Build.Dense (new double[] {oneStep[3], oneStep[4], oneStep[5] });
-				if (stoppingConditionABS (biped.data.currentQ) < 0.0) {
+
+                biped.simulationData.RES[i + 1] = new Tuple<Vector<double>, double>(oneStep, biped.simulationData.time[i + 1]);
+                biped.simulationData.currentQ = Vector<double>.Build.Dense(new double[] { oneStep[0], oneStep[1], oneStep[2] });
+                biped.simulationData.currentDQ = Vector<double>.Build.Dense(new double[] { oneStep[3], oneStep[4], oneStep[5] });
+                //check if both legs hits the ground and a heel strike is occuring (dq3 < 0)
+                if ((stoppingConditionABS(biped.simulationData.currentQ) < 0.0) && oneStep[5] < 0.0)
+                {
 					break;
 				}
 			}
@@ -173,7 +177,7 @@ namespace BipedRobot{
 
 		public static Vector<double> rk4(Biped biped)
 		{
-			double dx = biped.data.timestep;
+            double dx = biped.simulationData.timestep;
 			double halfdx = 0.5 * dx;
 			double sixth = 1.0 / 6.0;
 
@@ -183,18 +187,18 @@ namespace BipedRobot{
 			Vector<double> k3 = dx * BRDynamics.rhs6D(biped, k2*halfdx);
 			Vector<double> k4 = dx * BRDynamics.rhs6D(biped, k3*dx);
 
-			return (Vector<double>.Build.Dense (new double[] {biped.data.currentQ[0], biped.data.currentQ[1], biped.data.currentQ[2],
-				biped.data.currentDQ[0], biped.data.currentDQ[1], biped.data.currentDQ[2]
+            return (Vector<double>.Build.Dense(new double[] {biped.simulationData.currentQ[0], biped.simulationData.currentQ[1], biped.simulationData.currentQ[2],
+				biped.simulationData.currentDQ[0], biped.simulationData.currentDQ[1], biped.simulationData.currentDQ[2]
 			}) +
 				sixth * (k1 + 2 * k2 + 2 * k3 + k4));
 		}
 
         public static Vector<double> constantStep(Biped biped)
         {
-            double dx = biped.data.timestep;
+            double dx = biped.simulationData.timestep;
             Vector<double> k0 = Vector<double>.Build.Dense(new double[] { 0, 0, 0, 0, 0, 0 });
-            Vector<double> dq =biped.data.currentDQ + dx * BRDynamics.rhs3D(biped, k0);
-            Vector<double> q = biped.data.currentQ + dx * 0.5 * (dq + biped.data.currentDQ);
+            Vector<double> dq = biped.simulationData.currentDQ + dx * BRDynamics.rhs3D(biped, k0);
+            Vector<double> q = biped.simulationData.currentQ + dx * 0.5 * (dq + biped.simulationData.currentDQ);
 
             return Vector<double>.Build.Dense(new double[] { q[0], q[1], q[2], dq[0], dq[1], dq[2] });
         }
@@ -204,16 +208,16 @@ namespace BipedRobot{
             Vector<double> DQ = BRDynamics.impactMapAngularMomentum(biped);
             Vector<double> Q = BRDynamics.stanceSwitch(biped);
 
-            biped.data.currentQ = Q;
-            biped.data.currentDQ = DQ;
+            biped.simulationData.currentQ = Q;
+            biped.simulationData.currentDQ = DQ;
         }
     }
 
     public static class integrationReducedDynamics
     {
-        public static BRReducedData run(BRVHC vhc, Vector<double> integrationStart, Vector<double> integrationEnd)
+        public static BRReducedSimulationData run(BRVHC vhc, Vector<double> integrationStart, Vector<double> integrationEnd)
         {
-            BRReducedData data = new BRReducedData(0.001, Vector<double>.Build.Dense(new double[] { integrationStart[0], integrationStart[1],
+            BRReducedSimulationData data = new BRReducedSimulationData(0.001, Vector<double>.Build.Dense(new double[] { integrationStart[0], integrationStart[1],
                 BRReducedDynamics.rhs1D(integrationStart, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma)}));
             int i = 0;
             Vector<double> oneStep = integrationStart;
@@ -278,7 +282,7 @@ namespace BipedRobot{
 
     public static class calculateTorques
     {
-        public static BRTorques run(BRVHC vhc, BRReducedData data)
+        public static BRTorques run(BRVHC vhc, BRReducedSimulationData data)
         {
             BRTorques torques = new BRTorques(data.RES.Count);
 

@@ -14,12 +14,12 @@ namespace BipedRobot{
         [STAThread]
         static void Main(string[] args)
         {
-            MainForm mainForm = new MainForm();
-            //Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
+            //MainForm mainForm = new MainForm();
+            Biped biped = new Biped(@"../../../CAD_params_ILeg.xml");
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //findGaitsManually(biped);
-            //test(biped);
+            test(biped);
             //XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
             
         }
@@ -71,11 +71,6 @@ namespace BipedRobot{
             gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
 
 
-
-
-
-
-
             double dtheta0Squared = 0;// Math.Pow(dtheta0, 2);
             double dthetaTSquared = 0;// Math.Pow(dthetaT, 2);
 
@@ -83,9 +78,9 @@ namespace BipedRobot{
 
             Phaseportrait plot = new Phaseportrait(THETA);
 
-            BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
+            BRReducedSimulationData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
                 Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
-            biped.reducedData = data;
+            biped.reducedSimulationData = data;
 
             graph graph = new graph(biped);
 
@@ -251,9 +246,9 @@ namespace BipedRobot{
 
             Phaseportrait plot = new Phaseportrait(THETA);
 
-            BRReducedData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
+            BRReducedSimulationData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
                 Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
-            biped.reducedData = data;
+            biped.reducedSimulationData = data;
 
             graph graph = new graph(biped);
 

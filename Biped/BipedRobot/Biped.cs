@@ -16,15 +16,15 @@ namespace BipedRobot
     public class Biped
     {
         private BRParameters _param;
-        private BRData _data;
-        private BRReducedData _reducedData;
-        private List<BRgait> _gaits;
+        private BRSimulationData _simulationData;
+        private BRReducedSimulationData _reducedSimulationData;
+        private BRgait _gait;
 
         public Biped(string fileName)
         {
             _param = XMLBRParser.getXMLData(fileName);
-            _data = new BRData();
-            _gaits = new List<BRgait>();
+            _simulationData = new BRSimulationData();
+            _gait = null;
         }
 
         public BRParameters param
@@ -39,39 +39,39 @@ namespace BipedRobot
             }
         }
 
-        public BRData data
+        public BRSimulationData simulationData
         {
             get
             {
-                return _data;
+                return _simulationData;
             }
             set
             {
-                _data = value;
+                _simulationData = value;
             }
         }
 
-        public BRReducedData reducedData
+        public BRReducedSimulationData reducedSimulationData
         {
             get
             {
-                return _reducedData;
+                return _reducedSimulationData;
             }
             set
             {
-                _reducedData = value;
+                _reducedSimulationData = value;
             }
         }
 
-        public List<BRgait> gaits
+        public BRgait gait
         {
             get
             {
-                return _gaits;
+                return _gait;
             }
             set
             {
-                _gaits = value;
+                _gait = value;
             }
         }
 
@@ -331,7 +331,7 @@ namespace BipedRobot
         }
     }
 
-    public class BRData
+    public class BRSimulationData
     {
 
         private Vector<double> _currentQ;
@@ -418,9 +418,10 @@ namespace BipedRobot
 
     public static class BRDynamics
     {
+
         public static Vector<double> rhs3D(Biped biped, Vector<double> dx)
         {
-            BRData data = biped.data;
+            BRSimulationData data = biped.simulationData;
             BRParameters param = biped.param;
             double q1 = data.currentQ[0] + dx[0];
             double q2 = data.currentQ[1] + dx[1];
@@ -478,15 +479,14 @@ namespace BipedRobot
         }
         public static Vector<double> rhs6D(Biped biped, Vector<double> dx)
         {
-            BRData data = biped.data;
-            BRParameters param = biped.param;
+            BRSimulationData data = biped.simulationData;
             Vector<double> rhs3d = rhs3D(biped, dx);
             Vector<double> rhs6d = Vector.Build.Dense(new double[] { data.currentDQ[0] + dx[3], data.currentDQ[1] + dx[4], data.currentDQ[2] + dx[5], rhs3d[0], rhs3d[1], rhs3d[2] });
             return rhs6d;
         }
         public static double potentialEnergyAbsoluteAngles(Biped biped)
         {
-            BRData data = biped.data;
+            BRSimulationData data = biped.simulationData;
             BRParameters param = biped.param;
             double q1 = data.currentQ[0];
             double q2 = data.currentQ[1];
@@ -500,7 +500,7 @@ namespace BipedRobot
         }
         public static double kineticEnergyAbsoluteAngles(Biped biped)
         {
-            BRData data = biped.data;
+            BRSimulationData data = biped.simulationData;
             BRParameters param = biped.param;
             double K1 = 0.5 * param.m1 * Math.Pow(param.l1, 2) * Math.Pow(data.currentDQ[0], 2) + 0.5 * param.J1 * Math.Pow(data.currentDQ[0], 2);
 
@@ -516,7 +516,7 @@ namespace BipedRobot
 
         public static Vector<double> impactMapAngularMomentum(Biped biped)
         {
-            BRData data = biped.data;
+            BRSimulationData data = biped.simulationData;
             BRParameters param = biped.param;
             double q1 = data.currentQ[0];
             double q2 = data.currentQ[1];
@@ -526,49 +526,69 @@ namespace BipedRobot
             double dq2 = data.currentDQ[1];
             double dq3 = data.currentDQ[2];
 
-            double Qpos11 = -param.L1 * param.L3 * param.m1 * Math.Cos(q1 - q3) + param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3);
+            double g = param.g;
+            double m1 = param.m1;
+            double m2 = param.m2;
+            double m3 = param.m3;
+
+            double l1 = param.l1;
+            double l2 = param.l2;
+            double l3 = param.l3;
+
+            double L1 = param.L1;
+            double L2 = param.L2;
+            double L3 = param.L3;
+
+            double J1 = param.J1;
+            double J2 = param.J2;
+            double J3 = param.J3;
+
+            double Qpos11 = L1 * L1 * m1 - 2 * L1 * l1 * m1 + m1 * l1 * l1 + J1;
             double Qpos12 = 0;
-            double Qpos13 = Math.Pow(param.L1, 2) * param.m1 - 2 * param.L1 * param.l1 * param.m1 + Math.Pow(param.l1, 2) * param.m1 + param.J1;
+            double Qpos13 = -L1 * L3 * m1 * Math.Cos(q1 - q3) + L3 * l1 * m1 * Math.Cos(q1 - q3);
 
-            double Qpos21 = param.L3 * param.l2 * param.m1 * Math.Cos(q2 - q3);
-            double Qpos22 = Math.Pow(param.l2, 2) * param.m1 + param.J2;
-            double Qpos23 = 0;
+            double Qpos21 = 0;
+            double Qpos22 = l2 * l2 * m2 + J2;
+            double Qpos23 = L3 * l2 * m2 * Math.Cos(q2 - q3);
 
-            double Qpos31 = Math.Pow(param.l3, 2) * param.m3 + Math.Pow(param.L3, 2) * param.m2 + Math.Pow(param.L3, 2) * param.m3 +
-                Math.Pow(param.L3, 2) * param.m1 - 2 * param.L3 * param.l3 * param.m3 + param.L3 * param.l2 * param.m2 * Math.Cos(q2 - q3) +
-                param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) - param.L1 * param.L3 * param.m1 * Math.Cos(q1 - q3) + param.J3;
-            double Qpos32 = param.L3 * param.l2 * param.m2 * Math.Cos(q2 - q3) + Math.Pow(param.l2, 2) * param.m2 + param.J2;
-            double Qpos33 = Math.Pow(param.L1, 2) * param.m1 - param.L1 * param.L3 * param.m1 * Math.Cos(q1 - q3) -
-                2 * param.L1 * param.l1 * param.m1 + param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) + Math.Pow(param.l1, 2) * param.m1 + param.J1;
+            double Qpos31 = L1 * L1 * m1 - L1 * L3 * m1 * Math.Cos(q1 - q3) - 2 * L1 * l1 * m1 + L3 * l1 * m1 * Math.Cos(q1 - q3) + m1 * l1 * l1 + J1;
+            double Qpos32 = L3 * l2 * m2 * Math.Cos(q2 - q3) + l2 * l2 * m2 + J2;
+            double Qpos33 = -0.2e1 * m3 * l3 * L3 - L1 * L3 * m1 * Math.Cos(q1 - q3) + L3 * l1 * m1 * Math.Cos(q1 - q3) + L3 * l2 * m2 * Math.Cos(q2 - q3) + l3 * l3 * m3 + J3 + L3 * L3 * m3 + L3 * L3 * m2 + L3 * L3 * m1;
 
 
-            double Qneg11 = -param.L1 * param.l1 * param.m1 + param.m1 * param.l1 * param.l1 + param.J1;
+            double Qneg11 = -L1 * l1 * m1 + m1 * l1 * l1 + J1;
             double Qneg12 = 0;
             double Qneg13 = 0;
-            double Qneg21 = param.L1 * param.l2 * param.m1 * Math.Cos(q1 - q2);
-            double Qneg22 = param.l2 * param.l2 * param.m1 + param.J2;
+            double Qneg21 = L1 * Math.Cos(-q2 + q1) * l2 * m2;
+            double Qneg22 = l2 * l2 * m2 + J2;
             double Qneg23 = 0;
-            double Qneg31 = param.J1 - param.L1 * param.l1 * param.m1 + param.L1 * param.L3 * param.m2 * Math.Cos(q1 - q3) + param.L1 * param.L3 * param.m3 * Math.Cos(q1 - q3) -
-                param.L1 * Math.Cos(q1 - q3) * param.l3 * param.m3 + param.L1 * Math.Cos(q1 - q2) * param.l2 * param.m2 + param.L3 * param.l1 * param.m1 * Math.Cos(q1 - q3) + 
-                param.m1 * param.l1 * param.l1;
-            double Qneg32 = param.L3 * param.l2 * param.m2 * Math.Cos(-q3 + q2) + param.l2 * param.l2 * param.m2 + param.J2;
-            double Qneg33 = -param.L3 * param.l3 * param.m3 + param.l3 * param.l3 * param.m3 + param.J3;
+            double Qneg31 = L1 * Math.Cos(-q2 + q1) * l2 * m2 + L3 * l1 * m1 * Math.Cos(q1 - q3) + L1 * L3 * m2 * Math.Cos(q1 - q3) + m3 * L1 * L3 * Math.Cos(q1 - q3) - L1 * l1 * m1 - L1 * Math.Cos(q1 - q3) * l3 * m3 + m1 * l1 * l1 + J1;
+            double Qneg32 = L3 * l2 * m2 * Math.Cos(q2 - q3) + l2 * l2 * m2 + J2;
+            double Qneg33 = -m3 * l3 * L3 + l3 * l3 * m3 + J3;
 
-            Matrix <double> Qpos = Matrix<double>.Build.DenseOfArray(new double[,]
+            Matrix <double> Q = Matrix<double>.Build.DenseOfArray(new double[,]
             {
                 {Qpos11,Qpos12,Qpos13 },
                 {Qpos21,Qpos22,Qpos23 },
                 {Qpos31,Qpos32,Qpos33 }
             });
 
-            Matrix<double> Qneg = Matrix<double>.Build.DenseOfArray(new double[,]
+            Matrix<double> P = Matrix<double>.Build.DenseOfArray(new double[,]
             {
                 {Qneg11,Qneg12,Qneg13 },
                 {Qneg21,Qneg22,Qneg23 },
                 {Qneg31,Qneg32,Qneg33 }
             });
+            Matrix<double> pmatrix = Matrix<double>.Build.DenseOfArray(new double[,]
+            {
+                {0,0,1},
+                {0,1,0},
+                {1,0,0},
+            
+            });
 
-            Vector<double> qpos = Qpos.Solve(Qneg*data.currentDQ);
+            Matrix<double> A = pmatrix * Q.Solve(P);
+            Vector<double> qpos = A*data.currentDQ;
 
             return qpos;
         }
@@ -582,16 +602,16 @@ namespace BipedRobot
                 {1,0,0 }
             });
 
-            return ss.Multiply(biped.data.currentQ);
+            return ss.Multiply(biped.simulationData.currentQ);
         }
     }
 
-    public class BRReducedData
+    public class BRReducedSimulationData
     {
         private List<Tuple<Vector<double>, double>> _RES;
         private double _timestep;
 
-        public BRReducedData(double timestep, Vector<double> start)
+        public BRReducedSimulationData(double timestep, Vector<double> start)
         {
             _RES = new List<Tuple<Vector<double>, double>>();
             _RES.Add(new Tuple<Vector<double>,double>(start,0));
@@ -639,6 +659,7 @@ namespace BipedRobot
             return rhs2D;
         }
     }
+    
     public class BRTorques
     {
         private double[] _torque1;

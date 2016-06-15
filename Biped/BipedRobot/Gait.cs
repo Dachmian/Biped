@@ -223,24 +223,6 @@ namespace BipedRobot
             setVHC(ref gait, numberOfPoints);
             //begin search
 
-
-
-
-            //write to file
-            StreamWriter fs = null;
-            fs = new StreamWriter(@"../../../foundGaits.txt");
-            foreach (BRgait g in biped.gaits)
-            {
-                fs.WriteLine(Infix.Format(g.vhc.phi1));
-                fs.WriteLine(Infix.Format(g.vhc.phi1));
-                fs.WriteLine(Infix.Format(g.vhc.phi1));
-                fs.WriteLine(g.impactFirstLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-                fs.WriteLine(g.impactSecondLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-                fs.WriteLine(g.impactThirdLine(gait.gaitParam.theta0, gait.gaitParam.thetaT));
-                fs.WriteLine();
-            }
-            fs.Close();
-
         }
         
         public static void setParametersRandom(ref BRgait gait)
@@ -1255,7 +1237,7 @@ namespace BipedRobot
     {
         private BRVHC _vhc;
         private BRGaitParameters _gaitParam;
-        private BRReducedData _data;
+        private BRReducedSimulationData _data;
 
         public BRgait(BRParameters param, int numberOfPoints)
         {
@@ -1284,7 +1266,7 @@ namespace BipedRobot
                 _gaitParam = value;
             }
         }
-        public BRReducedData data
+        public BRReducedSimulationData data
         {
             get
             {
