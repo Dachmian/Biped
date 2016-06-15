@@ -20,7 +20,7 @@ namespace BipedRobot{
             //plotting.plotStates(biped);
             //findGaitsManually(biped);
             test(biped);
-            //XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
+            XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
             
         }
 
