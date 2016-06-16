@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SLSQPCoM.cs" />
     <Compile Include="SQP.cs" />
     <Compile Include="TorquesGraph.cs">
       <SubType>Form</SubType>
