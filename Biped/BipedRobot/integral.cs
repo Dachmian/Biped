@@ -380,7 +380,7 @@ namespace BipedRobot
             double step = (intervalEnd - intervalBegin) / numberOfPartitions;
             double offset = 0;
             double val = 0;
-            double theta = 0;
+            double theta = intervalBegin;
             double[][] RES = new double[2][];
             for (int i = 0; i < 2; i++)
             {
@@ -402,7 +402,7 @@ namespace BipedRobot
             double step = (intervalEnd - intervalBegin) / numberOfPartitions;
             double offset = 0;
             double val = 0;
-            double theta = 0;
+            double theta = intervalBegin;
             double[][] RES = new double[2][];
             for (int i = 0; i < 2; i++)
             {

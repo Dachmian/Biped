@@ -19,8 +19,9 @@ namespace BipedRobot{
             //IntegrationFullDynamics.run(ref biped);
             //plotting.plotStates(biped);
             //findGaitsManually(biped);
-            test(biped);
-            XMLBRParser.writeXMLDataToFile("physicalParameters",biped.param);
+            //test(biped);
+            XMLBRParser.writeXMLDataToFile("physicalParameters", biped.param);
+            findCoMGait(biped);
             
         }
 
@@ -337,9 +338,211 @@ namespace BipedRobot{
         }
 
 
+        static void findCoMGait(Biped biped)
+        {
+            int numberOfPoints = 6;
+            BRgait gait = new BRgait(biped.param, numberOfPoints);
+            BezierCurve brCrv = new BezierCurve(numberOfPoints, gait);
 
 
-       }
+            string[] parameters = File.ReadAllLines(@"../../../../parameters.txt");
+            //double dtheta0 = Convert.ToDouble(File.ReadAllLines(@"../../../../dtheta0.txt")[0], CultureInfo.InvariantCulture);
+            //double dthetaT = Convert.ToDouble(File.ReadAllLines(@"../../../../dthetaT.txt")[0], CultureInfo.InvariantCulture);
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                Console.WriteLine(parameters[i]);
+            }
+            Tuple<Dictionary<string, FloatingPoint>, string> tuple = brCrv.phi1ToString();
+            gait.vhc.phi1 = Infix.ParseOrUndefined(tuple.Item2);
+
+            for (int i = 0; i < 6; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
+
+            }
+            gait.vhc.phi1Parameters = tuple.Item1;
+
+            tuple = brCrv.phi2ToString();
+            gait.vhc.phi2 = Infix.ParseOrUndefined(tuple.Item2);
+            for (int i = 6; i < 12; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
+
+            }
+            gait.vhc.phi2Parameters = tuple.Item1;
+
+            tuple = brCrv.phi3ToString();
+            gait.vhc.phi3 = Infix.ParseOrUndefined(tuple.Item2);
+            for (int i = 12; i < 18; i++)
+            {
+                tuple.Item1["P" + i.ToString()] = Convert.ToDouble(parameters[i], CultureInfo.InvariantCulture);
+
+            }
+            gait.vhc.phi3Parameters = tuple.Item1;
+
+            gait.vhc.dphi1 = Infix.ParseOrUndefined(brCrv.dphi1ToString());
+            gait.vhc.dphi2 = Infix.ParseOrUndefined(brCrv.dphi2ToString());
+            gait.vhc.dphi3 = Infix.ParseOrUndefined(brCrv.dphi3ToString());
+
+            gait.vhc.ddphi1 = Infix.ParseOrUndefined(brCrv.ddphi1ToString());
+            gait.vhc.ddphi2 = Infix.ParseOrUndefined(brCrv.ddphi2ToString());
+            gait.vhc.ddphi3 = Infix.ParseOrUndefined(brCrv.ddphi3ToString());
+
+            biped.gait = gait;
+            double dtheta0Squared = 0;// Math.Pow(dtheta0, 2);
+            double dthetaTSquared = 0;// Math.Pow(dthetaT, 2);
+            while (true)
+            {
+                SLSQPCoM slSQP = new SLSQPCoM(biped, numberOfPoints);
+                slSQP.runAlphaAndDtheta();
+                double[] theta = thetaRange(gait.vhc.phi1Parameters["P0"].RealValue, gait.vhc.phi2Parameters["P6"].RealValue, gait.vhc.phi3Parameters["P12"].RealValue, biped.param);
+                double test2 = evaluateAlphaConstraint(theta[0], theta[1], gait);
+                double testere = evaluateDthetaConstraintCoM(theta[0], theta[1], gait);
+                if ((evaluateAlphaConstraint(theta[0], theta[1], gait) > 0) || (evaluateDthetaConstraintCoM(theta[0], theta[1], gait) < 0))
+                {
+                    continue;
+                }
+                slSQP.runImpact();
+
+                Console.WriteLine(gait.impactFirstLine(theta[0], theta[1]));
+                Console.WriteLine(gait.impactSecondLine(theta[0], theta[1]));
+                Console.WriteLine(gait.impactThirdLine(theta[0], theta[1]));
+                double[,] THETA = evalDthetaCoM(gait, ref dtheta0Squared, ref dthetaTSquared, theta[0], theta[1]);
+
+                Phaseportrait plot = new Phaseportrait(THETA);
+            }
+            //BRReducedSimulationData data = integrationReducedDynamics.run(gait.vhc, Vector<double>.Build.Dense(new double[] { 0, Math.Sqrt(dtheta0Squared) }),
+            //    Vector<double>.Build.Dense(new double[] { 1, Math.Sqrt(dthetaTSquared) }));
+            //biped.reducedSimulationData = data;
+
+            //graph graph = new graph(biped);
+
+            //BRTorques torques = calculateTorques2.run(gait.vhc, THETA);
+            //TorquesGraph torquesGraph = new TorquesGraph(torques);
+        }
+
+        public static double[,] evalDthetaCoM(BRgait gait, ref double dtheta0Squared, ref double dthetaTSquared, double thetaMin, double thetaMax)
+        {
+            double[][] firstIntegral = TrapezoidalSum2.calculateFirstIntegral(gait.vhc.evalTwoTimesBetaDividedByAlpha, thetaMin, thetaMax, 200);
+            double firstIntegralVALUE = GaussLegendreRule.Integrate(gait.firstIntegral, thetaMin, thetaMax, 100);
+            double secondIntegralVALUE = GaussLegendreRule.Integrate(gait.secondIntegral, thetaMin, thetaMax, 100);
+            double[][] secondIntegral = TrapezoidalSum2.calculateSecondIntegral(gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral[1], thetaMin, thetaMax, 200);
+            int len = firstIntegral[1].Length;
+            dthetaTSquared = (-secondIntegral[1][len - 1] * Math.Exp(firstIntegral[1][len - 1])) / (1 - Math.Exp(firstIntegral[1][len - 1]) * Math.Pow(gait.impactSecondLine(thetaMin, thetaMax), 2));
+            dtheta0Squared = dthetaTSquared * Math.Pow(gait.impactSecondLine(thetaMin, thetaMax), 2);
+            double dthetaTSquaredTest = (-secondIntegralVALUE) / (1 - Math.Exp(-firstIntegralVALUE) * Math.Pow(gait.impactSecondLine(thetaMin, thetaMax), 2));
+            double dtheta0squaredTest = dthetaTSquaredTest * Math.Pow(gait.impactSecondLine(thetaMin, thetaMax), 2);
+            double[,] THETA = new double[2, 8 * (len)];
+            double temp = 0;
+            for (int j = 0; j < 8; j++)
+            {
+                THETA[0, j * len] = thetaMin;
+                THETA[1, j * len] = Math.Sqrt(dtheta0Squared);
+                for (int i = 1; i < len; i++)
+                {
+                    THETA[0, i + j * len] = secondIntegral[0][i];
+                    THETA[1, i + j * len] = Math.Sqrt(-secondIntegral[1][i] * Math.Exp(firstIntegral[1][i]) + Math.Exp(firstIntegral[1][i]) * dtheta0Squared);
+                    temp = THETA[1, i];
+                }
+                dtheta0Squared = Math.Pow(gait.impactSecondLine(0, 1), 2) * Math.Pow(temp, 2);
+            }
+            using (StreamWriter file =
+                        new System.IO.StreamWriter(@"../../../../VALS.txt", true))
+            {
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(THETA[0, i]);
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(THETA[1, i]);
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(Math.Exp(firstIntegral[1][i]));
+                }
+                file.WriteLine("");
+                for (int i = 0; i < len; i += 20)
+                {
+                    file.WriteLine(secondIntegral[1][i]);
+                }
+                file.WriteLine("");
+            }
+            return THETA;
+        }
+        public static double[] thetaRange(double P0, double P6, double P12, BRParameters _param)
+        {
+            double a = -(_param.m1 * _param.l1 + _param.m2 * _param.L1 + _param.m3 * _param.L1) / (_param.m1 + _param.m2 + _param.m3);
+            double b = -(_param.m2 * _param.l2) / (_param.m1 + _param.m2 + _param.m3);
+            double c = -(_param.m3 * _param.l3) / (_param.m1 + _param.m2 + _param.m3);
+            double thetaMin = a * P0 + b * P6 + c * P12;
+            double thetaMax = a * (-P0) + b * (P6) + c * (-P12);
+            return new double[] { thetaMin, thetaMax };
+        }
+        public static double evaluateAlphaConstraint(double thetaMin, double thetaMax, BRgait _gait)
+        {
+
+
+            double dx = 0.02;
+            double theta = thetaMin;
+            double val = double.MinValue;
+            double alphaVal = 0;
+            for (int i = 0; i < thetaMax / dx; i++)
+            {
+                alphaVal = _gait.vhc.evalAlpha(theta);
+                if (alphaVal > val)
+                {
+                    val = alphaVal;
+                }
+                theta += dx;
+            }
+            return val;
+        }
+        public static double evaluateDthetaConstraintCoM(double thetaMin, double thetaMax, BRgait _gait)
+        {
+            double[][] firstIntegral = TrapezoidalSum2.calculateFirstIntegral(_gait.vhc.evalTwoTimesBetaDividedByAlpha, thetaMin, thetaMax, 200);
+            double[][] secondIntegral = TrapezoidalSum2.calculateSecondIntegral(_gait.vhc.evalTwoTimesGammaDividedByAlpha, firstIntegral[1], thetaMin, thetaMax, 200);
+            int len = firstIntegral[1].Length;
+            double dthetaTSquared = (-secondIntegral[1][len - 1] * Math.Exp(firstIntegral[1][len - 1])) / (1 - Math.Exp(firstIntegral[1][len - 1]) * Math.Pow(_gait.impactSecondLine(thetaMin, thetaMax), 2));
+            double dtheta0Squared = dthetaTSquared * Math.Pow(_gait.impactSecondLine(thetaMin, thetaMax), 2);
+            double dthetaMin = 0;
+            if (double.IsNaN(dthetaTSquared))
+            {
+                dthetaMin = (-Math.Pow(10, 300));
+            }
+            else if (double.IsPositiveInfinity(dthetaTSquared))
+            {
+                dthetaMin = (-Math.Pow(10, 300));
+            }
+            else if (double.IsNaN(dtheta0Squared))
+            {
+                dthetaMin = (-Math.Pow(10, 300));
+            }
+            else if (double.IsPositiveInfinity(dtheta0Squared))
+            {
+                dthetaMin = (-Math.Pow(10, 300));
+            }
+            else
+            {
+                double[,] THETA = new double[2, len];
+                THETA[0, 0] = thetaMin;
+                THETA[1, 0] = dtheta0Squared;
+                dthetaMin = dtheta0Squared;
+                for (int i = 1; i < len; i++)
+                {
+                    THETA[0, i] = secondIntegral[0][i];
+                    THETA[1, i] = -secondIntegral[1][i] * Math.Exp(firstIntegral[1][i]) + Math.Exp(firstIntegral[1][i]) * dtheta0Squared;
+                    if (THETA[1, i] < dthetaMin)
+                    {
+                        dthetaMin = THETA[1, i];
+                    }
+                }
+            }
+            return dthetaMin;
+        }
+    }
 
     
 }
