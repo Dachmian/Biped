@@ -138,6 +138,12 @@
     <Compile Include="BezierCurve.cs" />
     <Compile Include="Biped.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="ErrorGraph.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErrorGraph.Designer.cs">
+      <DependentUpon>ErrorGraph.cs</DependentUpon>
+    </Compile>
     <Compile Include="Gait.cs" />
     <Compile Include="graph.cs">
       <SubType>Form</SubType>
@@ -174,7 +180,16 @@
     <Compile Include="TrajectoryGraph.Designer.cs">
       <DependentUpon>TrajectoryGraph.cs</DependentUpon>
     </Compile>
+    <Compile Include="TrajectoryPortrait.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TrajectoryPortrait.Designer.cs">
+      <DependentUpon>TrajectoryPortrait.cs</DependentUpon>
+    </Compile>
     <Compile Include="utility.cs" />
+    <EmbeddedResource Include="ErrorGraph.resx">
+      <DependentUpon>ErrorGraph.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="graph.resx">
       <DependentUpon>graph.cs</DependentUpon>
     </EmbeddedResource>
@@ -198,6 +213,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TrajectoryGraph.resx">
       <DependentUpon>TrajectoryGraph.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TrajectoryPortrait.resx">
+      <DependentUpon>TrajectoryPortrait.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />

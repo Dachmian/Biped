@@ -18,9 +18,45 @@ namespace BipedRobot
     {
         private BRgait _gait;
         private BRParameters _param;
-        double _P0;
-        double _P6;
-        double _P12;
+        double _q1;
+        double _q2;
+        double _q3;
+        double _thetaMin;
+        double _thetaMax;
+
+        public double q1
+        {
+            get
+            {
+                return _q1;
+            }
+            set
+            {
+                _q1 = value;
+            }
+        }
+        public double q2
+        {
+            get
+            {
+                return _q2;
+            }
+            set
+            {
+                _q2 = value;
+            }
+        }
+        public double q3
+        {
+            get
+            {
+                return _q3;
+            }
+            set
+            {
+                _q3 = value;
+            }
+        }
 
         private double[] _currentParameterValues;
         private static double _step = 1e-6;
@@ -35,18 +71,23 @@ namespace BipedRobot
             _currentParameterValues = new double[3 * numOfParams];
             while (true) {
                 Random rndm = new Random();
-                //map from 0 to 1 to 0.07-0.157
-                _P0 = (((rndm.NextDouble() - 0.0) * (0.157 - 0.07)) / (1 - 0) + 0.07);
-                _P6 = (((rndm.NextDouble() - 0.0) * (0.157 - 0.07)) / (1 - 0) + 0.07);
-                _P12 = -_P0;
-                double[] theta = thetaRange(_P0, _P6, _P12);
-                double[] x = new double[3 * numOfParams - 3];
-                for(int i = 0; i < 3 * numOfParams - 3; i++)
+                _q1 = (((rndm.NextDouble() - 0.0) * (0.157 - (0.07))) / (1 - 0) + (0.07));
+                _q2 = -(((rndm.NextDouble() - 0.0) * (0.157 - (0.07))) / (1 - 0) + (0.07));
+                _q3 = -_q1;
+                thetaRange(_q1, _q2, _q3);
+                double[] x = new double[3 * numOfParams];
+                for(int i = 0; i < 3 * numOfParams; i++)
                 {
                     x[i] = (((rndm.NextDouble() - 0.0) * (5 - (-5))) / (1 - 0) + (-5));
                 }
-                double[,] c = new double[,] { { theta[1], theta[1], theta[1], theta[1], theta[1], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2 * _P0 }, { 0, 0, 0, 0, 0, theta[1], theta[1], theta[1], theta[1], theta[1], 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, theta[1], theta[1], theta[1], theta[1], theta[1], -2 * _P12 } };
-                int[] ct = new int[] { 1, 1, 1};
+                double[,] c = new double[,] { {1 + 1, _thetaMin + _thetaMax, Math.Pow(_thetaMin, 2) + Math.Pow(_thetaMax, 2), Math.Pow(_thetaMin, 3) + Math.Pow(_thetaMax, 3), Math.Pow(_thetaMin, 4) + Math.Pow(_thetaMax, 4), Math.Pow(_thetaMin, 5) + Math.Pow(_thetaMax, 5), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   0 }, 
+                    { 0, 0, 0, 0, 0, 0, 1 - 1, _thetaMin - _thetaMax, Math.Pow(_thetaMin, 2) - Math.Pow(_thetaMax, 2), Math.Pow(_thetaMin, 3) - Math.Pow(_thetaMax, 3), Math.Pow(_thetaMin, 4) - Math.Pow(_thetaMax, 4), Math.Pow(_thetaMin, 5) - Math.Pow(_thetaMax, 5), 0, 0, 0, 0, 0, 0, 0 }, 
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 + 1, _thetaMin + _thetaMax, Math.Pow(_thetaMin, 2) + Math.Pow(_thetaMax, 2), Math.Pow(_thetaMin, 3) + Math.Pow(_thetaMax, 3), Math.Pow(_thetaMin, 4) + Math.Pow(_thetaMax, 4), Math.Pow(_thetaMin, 5) + Math.Pow(_thetaMax, 5),   0 },
+                    {1, _thetaMin, Math.Pow(_thetaMin, 2), Math.Pow(_thetaMin, 3), Math.Pow(_thetaMin, 4), Math.Pow(_thetaMin, 5), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   _q1 },
+                    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, _thetaMin, Math.Pow(_thetaMin, 2), Math.Pow(_thetaMin, 3), Math.Pow(_thetaMin, 4), Math.Pow(_thetaMin, 5),   _q3 },
+                    {0, 0, 0, 0, 0, 0, 1, _thetaMin, Math.Pow(_thetaMin, 2), Math.Pow(_thetaMin, 3), Math.Pow(_thetaMin, 4), Math.Pow(_thetaMin, 5), 0, 0, 0, 0, 0, 0,   _q2 },
+                };
+                int[] ct = new int[] { 0, 0, 0, 0, 0 ,0};
                 alglib.minbleicstate state;
                 alglib.minbleicreport rep;
 
@@ -55,7 +96,7 @@ namespace BipedRobot
                 //
                 // We use very simple condition - |g|<=epsg
                 //
-                double epsg = 0.001;
+                double epsg = 0.000001;
                 double epsf = 0;
                 double epsx = 0;
                 int maxits = 0;
@@ -79,12 +120,29 @@ namespace BipedRobot
                 System.Console.WriteLine("{0}", rep.terminationtype); // EXPECTED: 4
                 System.Console.WriteLine("{0}", alglib.ap.format(x, 2)); // EXPECTED: [-1,1]
                 System.Console.ReadLine();
-                double test1 = _P0 - (_P12 + theta[1] * x[10] + theta[1] * x[11] + theta[1] * x[12] + theta[1] * x[13] + theta[1] * x[14]);
-                double test2 = _P6 - (_P6 + theta[1] * x[5] + theta[1] * x[6] + theta[1] * x[7] + theta[1] * x[8] + theta[1] * x[9]);
-                double test3 = _P12 - (_P0 + theta[1] * x[0] + theta[1] * x[1] + theta[1] * x[2] + theta[1] * x[3] + theta[1] * x[4]);
-                if ((Math.Abs(test1) + Math.Abs(test2) + Math.Abs(test3)) < 0.001)
+                double test1 = x[0] + _thetaMin * x[1] + Math.Pow(_thetaMin, 2) * x[2] + Math.Pow(_thetaMin, 3) * x[3] + Math.Pow(_thetaMin, 4) * x[4] + Math.Pow(_thetaMin, 5) * x[5] - (x[12] + _thetaMax * x[13] + Math.Pow(_thetaMax, 2) * x[14] + Math.Pow(_thetaMax, 3) * x[15] + Math.Pow(_thetaMax, 4) * x[16] + Math.Pow(_thetaMax, 5) * x[17]);
+                double test2 = x[6] + _thetaMin * x[7] + Math.Pow(_thetaMin, 2) * x[8] + Math.Pow(_thetaMin, 3) * x[9] + Math.Pow(_thetaMin, 4) * x[10] + Math.Pow(_thetaMin, 5) * x[11] - (x[6] + _thetaMax * x[7] + Math.Pow(_thetaMax, 2) * x[8] + Math.Pow(_thetaMax, 3) * x[9] + Math.Pow(_thetaMax, 4) * x[10] + Math.Pow(_thetaMax, 5) * x[11]);
+                double test3 = x[12] + _thetaMin * x[13] + Math.Pow(_thetaMin, 2) * x[14] + Math.Pow(_thetaMin, 3) * x[15] + Math.Pow(_thetaMin, 4) * x[16] + Math.Pow(_thetaMin, 5) * x[17] - (x[0] + _thetaMax * x[1] + Math.Pow(_thetaMax, 2) * x[2] + Math.Pow(_thetaMax, 3) * x[3] + Math.Pow(_thetaMax, 4) * x[4] + Math.Pow(_thetaMax, 5) * x[5]);
+                if ((Math.Abs(test1) + Math.Abs(test2) + Math.Abs(test3)) < 0.01)
                 {
-                    _currentParameterValues = new double[] { _P0, x[0], x[1], x[2], x[3], x[4], _P6, x[5], x[6], x[7], x[8], x[9], _P12, x[10], x[11], x[12], x[13], x[14] };
+                    _currentParameterValues = new double[] { x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11], x[12], x[13], x[14], x[15], x[16], x[17] };
+                    int len = _currentParameterValues.Length / 3;
+
+                    for (int i = 0; i < len; i++)
+                    {
+                        _gait.vhc.phi1Parameters["P" + i.ToString()] = _currentParameterValues[i];
+
+                    }
+                    for (int i = len; i < 2 * len; i++)
+                    {
+                        _gait.vhc.phi2Parameters["P" + i.ToString()] = _currentParameterValues[i];
+
+                    }
+                    for (int i = 2 * len; i < 3 * len; i++)
+                    {
+                        _gait.vhc.phi3Parameters["P" + i.ToString()] = _currentParameterValues[i];
+
+                    }
                     break;
                 }
             }
@@ -94,8 +152,10 @@ namespace BipedRobot
 
         public void BLEICobjFunction(double[] x, ref double func, object obj)
         {
-            double[] theta = thetaRange(_P0, _P6, _P12);
-            func = Math.Pow((_P0 - (_P12 + theta[1] * x[10] + theta[1] * x[11] + theta[1] * x[12] + theta[1] * x[13] + theta[1] * x[14])),2) + Math.Pow((_P6 - (_P6 + theta[1] * x[5] + theta[1] * x[6] + theta[1] * x[7] + theta[1] * x[8] + theta[1] * x[9])), 2) + Math.Pow((_P12 - (_P0 + theta[1] * x[0] + theta[1] * x[1] + theta[1] * x[2] + theta[1] * x[3] + theta[1] * x[4])), 2);
+            //func = Math.Pow(((x[0] + _thetaMin * x[1] + Math.Pow(_thetaMin, 2) * x[2] + Math.Pow(_thetaMin, 3) * x[3] + Math.Pow(_thetaMin, 4) * x[4] + Math.Pow(_thetaMin, 5) * x[5]) - (x[12] + _thetaMax * x[13] + Math.Pow(_thetaMax, 2) * x[14] + Math.Pow(_thetaMax, 3) * x[15] + Math.Pow(_thetaMax, 4) * x[16] + Math.Pow(_thetaMax, 5) * x[17])), 2) +
+            //    Math.Pow(((x[6] + _thetaMin * x[7] + Math.Pow(_thetaMin, 2) * x[8] + Math.Pow(_thetaMin, 3) * x[9] + Math.Pow(_thetaMin, 4) * x[10] + Math.Pow(_thetaMin, 5) * x[11]) - (x[6] + _thetaMax * x[7] + Math.Pow(_thetaMax, 2) * x[8] + Math.Pow(_thetaMax, 3) * x[9] + Math.Pow(_thetaMax, 4) * x[10] + Math.Pow(_thetaMax, 5) * x[11])), 2) +
+            //    Math.Pow(((x[12] + _thetaMin * x[13] + Math.Pow(_thetaMin, 2) * x[14] + Math.Pow(_thetaMin, 3) * x[15] + Math.Pow(_thetaMin, 4) * x[16] + Math.Pow(_thetaMin, 5) * x[17]) - (x[0] + _thetaMax * x[1] + Math.Pow(_thetaMax, 2) * x[2] + Math.Pow(_thetaMax, 3) * x[3] + Math.Pow(_thetaMax, 4) * x[4] + Math.Pow(_thetaMax, 5) * x[5])), 2);
+            func = x[0];
         }
 
 
@@ -104,8 +164,8 @@ namespace BipedRobot
         {
             using (var solver = new NLoptSolver(NLoptAlgorithm.LD_SLSQP, 18, 0.0001, 100))
             {
-                solver.SetLowerBounds(new[] { -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0 });
-                solver.SetUpperBounds(new[] { 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0 });
+                solver.SetLowerBounds(new[] { -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0 });
+                solver.SetUpperBounds(new[] { 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0 });
 
                 solver.SetMinObjective(objfun);
                 solver.AddLessOrEqualZeroConstraint(alphaMaxConstraint, 0.001);
@@ -115,12 +175,117 @@ namespace BipedRobot
                 solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint4, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint5, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint6, 0.001);
 
                 double? finalScore;
 
                 var initialValue = _currentParameterValues;
                 var result = solver.Optimize(initialValue, out finalScore);
+                int len = _currentParameterValues.Length / 3;
 
+                for (int i = 0; i < len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi1Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi2Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi3Parameters["P" + i.ToString()].RealValue ;
+
+                }
+
+            }
+
+        }
+        public void runAlpha()
+        {
+            using (var solver = new NLoptSolver(NLoptAlgorithm.LD_SLSQP, 18, 0.0001, 100))
+            {
+                solver.SetLowerBounds(new[] { -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0 });
+                solver.SetUpperBounds(new[] { 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0 });
+
+                solver.SetMinObjective(objfun);
+                solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint4, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint5, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint6, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint7, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint8, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint9, 0.001);
+
+                double? finalScore;
+
+                var initialValue = _currentParameterValues;
+                var result = solver.Optimize(initialValue, out finalScore);
+                int len = _currentParameterValues.Length / 3;
+
+                for (int i = 0; i < len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi1Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi2Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi3Parameters["P" + i.ToString()].RealValue;
+
+                }
+            }
+
+        }
+        public void runDtheta()
+        {
+            using (var solver = new NLoptSolver(NLoptAlgorithm.LD_SLSQP, 18, 0.0001, 100))
+            {
+                solver.SetLowerBounds(new[] { -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0 });
+                solver.SetUpperBounds(new[] { 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0 });
+
+                solver.SetMinObjective(objfun);
+                solver.AddLessOrEqualZeroConstraint(alphaMaxConstraint, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint4, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint5, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint6, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint7, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint8, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint9, 0.001);
+
+                double? finalScore;
+
+                var initialValue = _currentParameterValues;
+                var result = solver.Optimize(initialValue, out finalScore);
+                int len = _currentParameterValues.Length / 3;
+
+                for (int i = 0; i < len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi1Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi2Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi3Parameters["P" + i.ToString()].RealValue;
+
+                }
             }
 
         }
@@ -128,19 +293,38 @@ namespace BipedRobot
         {
             using (var solver = new NLoptSolver(NLoptAlgorithm.LD_SLSQP, 18, 0.0001, 100))
             {
-                solver.SetLowerBounds(new[] { -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0 });
-                solver.SetUpperBounds(new[] { 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0 });
+                solver.SetLowerBounds(new[] { -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0 });
+                solver.SetUpperBounds(new[] { 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0 });
 
                 solver.SetMinObjective(objfunAlphaAndDtheta);
                 solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint4, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint5, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint6, 0.001);
 
                 double? finalScore;
 
                 var initialValue = _currentParameterValues;
                 var result = solver.Optimize(initialValue, out finalScore);
+                int len = _currentParameterValues.Length / 3;
 
+                for (int i = 0; i < len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi1Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi2Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi3Parameters["P" + i.ToString()].RealValue;
+
+                }
             }
 
         }
@@ -148,8 +332,8 @@ namespace BipedRobot
         {
             using (var solver = new NLoptSolver(NLoptAlgorithm.LD_SLSQP, 18, 0.0001, 100))
             {
-                solver.SetLowerBounds(new[] { -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0, -100.0 });
-                solver.SetUpperBounds(new[] { 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0 });
+                solver.SetLowerBounds(new[] { -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0, -0.2, -100.0, -100.0, -100.0, -100.0, -100.0 });
+                solver.SetUpperBounds(new[] { 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0, 0.2, 100.0, 100.0, 100.0, 100.0, 100.0 });
 
                 solver.SetMinObjective(objfunImpact);
                 solver.AddLessOrEqualZeroConstraint(alphaMaxConstraint, 0.001);
@@ -157,12 +341,34 @@ namespace BipedRobot
                 solver.AddEqualZeroConstraint(geometryConstraint1, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint2, 0.001);
                 solver.AddEqualZeroConstraint(geometryConstraint3, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint4, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint5, 0.001);
+                //solver.AddEqualZeroConstraint(geometryConstraint6, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint7, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint8, 0.001);
+                solver.AddEqualZeroConstraint(geometryConstraint9, 0.001);
 
                 double? finalScore;
 
                 var initialValue = _currentParameterValues;
                 var result = solver.Optimize(initialValue, out finalScore);
+                int len = _currentParameterValues.Length / 3;
 
+                for (int i = 0; i < len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi1Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi2Parameters["P" + i.ToString()].RealValue;
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _currentParameterValues[i] = _gait.vhc.phi3Parameters["P" + i.ToString()].RealValue;
+
+                }
             }
 
         }
@@ -170,9 +376,6 @@ namespace BipedRobot
         public double objfun(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -189,7 +392,7 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double[] values = evalTorques(thetaMin, thetaMax);
+            double[] values = evalTorques(_thetaMin, _thetaMax);
 
             if (grad != null)
             {
@@ -197,7 +400,7 @@ namespace BipedRobot
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValues = evalTorques(thetaMin, thetaMax);
+                    gradValues = evalTorques(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValues[0], 2) + Math.Pow(gradValues[1], 2) - (Math.Pow(values[0], 2) + Math.Pow(values[1], 2))) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -205,7 +408,7 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValues = evalTorques(thetaMin, thetaMax);
+                    gradValues = evalTorques(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValues[0], 2) + Math.Pow(gradValues[1], 2) - (Math.Pow(values[0], 2) + Math.Pow(values[1], 2))) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -213,7 +416,7 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValues = evalTorques(thetaMin, thetaMax);
+                    gradValues = evalTorques(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValues[0], 2) + Math.Pow(gradValues[1], 2) - (Math.Pow(values[0], 2) + Math.Pow(values[1], 2))) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -222,12 +425,9 @@ namespace BipedRobot
             return Math.Pow(values[0], 2) + Math.Pow(values[1], 2);
 
         }
-        public double objfunAlphaAndDtheta(double[] p, double[] grad)
+        public double objfunAlpha(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
             for (int i = 0; i < len; i++)
             {
                 _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
@@ -243,8 +443,108 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double alpha = evaluateAlphaConstraint(thetaMin, thetaMax);
-            double dthetaMin = evaluateDthetaConstraint(thetaMin, thetaMax);
+            double alpha = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+            if (grad != null)
+            {
+                double alphaVal;
+                for (int i = 0; i < len; i++)
+                {
+                    _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = (alphaVal - (alpha)) / _step;
+                    _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = (alphaVal - (alpha)) / _step;
+                    _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = (alphaVal - (alpha)) / _step;
+                    _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
+
+                }
+            }
+            return alpha;
+
+        }
+        public double objfunDtheta(double[] p, double[] grad)
+        {
+            int len = p.Length / 3;
+            for (int i = 0; i < len; i++)
+            {
+                _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
+
+            }
+            for (int i = len; i < 2 * len; i++)
+            {
+                _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
+
+            }
+            for (int i = 2 * len; i < 3 * len; i++)
+            {
+                _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
+
+            }
+            double dthetaMin = evaluateDthetaConstraint(_thetaMin, _thetaMax);
+            if (grad != null)
+            {
+                double dthetaMinVal;
+                for (int i = 0; i < len; i++)
+                {
+                    _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = ((-1) * dthetaMinVal - ((-1) * dthetaMin)) / _step;
+                    _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
+
+                }
+                for (int i = len; i < 2 * len; i++)
+                {
+                    _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = ((-1) * dthetaMinVal - ((-1) * dthetaMin)) / _step;
+                    _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
+
+                }
+                for (int i = 2 * len; i < 3 * len; i++)
+                {
+                    _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
+                    grad[i] = ((-1) * dthetaMinVal - ((-1) * dthetaMin)) / _step;
+                    _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
+
+                }
+            }
+            return (-1) * dthetaMin;
+
+        }
+        public double objfunAlphaAndDtheta(double[] p, double[] grad)
+        {
+            int len = p.Length / 3;
+            for (int i = 0; i < len; i++)
+            {
+                _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
+
+            }
+            for (int i = len; i < 2 * len; i++)
+            {
+                _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
+
+            }
+            for (int i = 2 * len; i < 3 * len; i++)
+            {
+                _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
+
+            }
+            double alpha = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+            double dthetaMin = evaluateDthetaConstraint(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double alphaVal;
@@ -252,8 +552,8 @@ namespace BipedRobot
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    alphaVal = evaluateAlphaConstraint(thetaMin, thetaMax);
-                    dthetaMinVal = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (alphaVal + (-1) * dthetaMinVal - (alpha + (-1) * dthetaMin)) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -261,8 +561,8 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    alphaVal = evaluateAlphaConstraint(thetaMin, thetaMax);
-                    dthetaMinVal = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (alphaVal + (-1) * dthetaMinVal - (alpha + (-1) * dthetaMin)) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -270,8 +570,8 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    alphaVal = evaluateAlphaConstraint(thetaMin, thetaMax);
-                    dthetaMinVal = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    alphaVal = evaluateAlphaConstraint(_thetaMin, _thetaMax);
+                    dthetaMinVal = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (alphaVal + (-1) * dthetaMinVal - (alpha + (-1) * dthetaMin)) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -283,9 +583,6 @@ namespace BipedRobot
         public double objfunImpact(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -302,8 +599,8 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double impactValue1 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
-            double impactValue2 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+            double impactValue1 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
+            double impactValue2 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double gradValue1;
@@ -311,8 +608,8 @@ namespace BipedRobot
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue1 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
-                    gradValue2 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue1 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
+                    gradValue2 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValue1, 2) + Math.Pow(gradValue2, 2) - (Math.Pow(impactValue1, 2) + Math.Pow(impactValue2, 2))) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -320,8 +617,8 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue1 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
-                    gradValue2 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue1 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
+                    gradValue2 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValue1, 2) + Math.Pow(gradValue2, 2) - (Math.Pow(impactValue1, 2) + Math.Pow(impactValue2, 2))) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -329,8 +626,8 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue1 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
-                    gradValue2 = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue1 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
+                    gradValue2 = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (Math.Pow(gradValue1, 2) + Math.Pow(gradValue2, 2) - (Math.Pow(impactValue1, 2) + Math.Pow(impactValue2, 2))) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -343,38 +640,33 @@ namespace BipedRobot
 
         public double geometryConstraint1(double[] p, double[] grad)
         {
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             if (grad != null)
             {
                 grad[0] = 1;
-                grad[1] = 0;
-                grad[2] = 0;
-                grad[3] = 0;
-                grad[4] = 0;
-                grad[5] = 0;
+                grad[1] = _thetaMin;
+                grad[2] = Math.Pow(_thetaMin, 2);
+                grad[3] = Math.Pow(_thetaMin, 3);
+                grad[4] = Math.Pow(_thetaMin, 4);
+                grad[5] = Math.Pow(_thetaMin, 5);
                 grad[6] = 0;
                 grad[7] = 0;
                 grad[8] = 0;
                 grad[9] = 0;
                 grad[10] = 0;
                 grad[11] = 0;
-                grad[12] = -thetaMax;
-                grad[13] = -thetaMax;
-                grad[14] = -thetaMax;
-                grad[15] = -thetaMax;
-                grad[16] = -thetaMax;
-                grad[17] = -thetaMax;
+                grad[12] = -1;
+                grad[13] = -_thetaMax;
+                grad[14] = -Math.Pow(_thetaMax, 2);
+                grad[15] = -Math.Pow(_thetaMax, 3);
+                grad[16] = -Math.Pow(_thetaMax, 4);
+                grad[17] = -Math.Pow(_thetaMax, 5);
             }
-            return p[0] - (p[12] + p[13] + p[14] + p[15] + p[16] + p[17]);
+            return p[0] + p[1] * _thetaMin + p[2] * Math.Pow(_thetaMin, 2) + p[3] * Math.Pow(_thetaMin, 3) + p[4] * Math.Pow(_thetaMin, 4) + p[5] * Math.Pow(_thetaMin, 5) - 
+                (p[12] + p[13] * _thetaMax + p[14] * Math.Pow(_thetaMax, 2) + p[15] * Math.Pow(_thetaMax, 3) + p[16] * Math.Pow(_thetaMax, 4) + p[17] * Math.Pow(_thetaMax, 5));
         }
         public double geometryConstraint2(double[] p, double[] grad)
         {
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
             if (grad != null)
             {
                 grad[0] = 0;
@@ -384,11 +676,11 @@ namespace BipedRobot
                 grad[4] = 0;
                 grad[5] = 0;
                 grad[6] = 0;
-                grad[7] = -thetaMax;
-                grad[8] = -thetaMax;
-                grad[9] = -thetaMax;
-                grad[10] = -thetaMax;
-                grad[11] = -thetaMax;
+                grad[7] = _thetaMin - _thetaMax;
+                grad[8] = Math.Pow(_thetaMin, 2) - Math.Pow(_thetaMax, 2);
+                grad[9] = Math.Pow(_thetaMin, 3) - Math.Pow(_thetaMax, 3);
+                grad[10] = Math.Pow(_thetaMin, 4) - Math.Pow(_thetaMax, 4);
+                grad[11] = Math.Pow(_thetaMin, 5) - Math.Pow(_thetaMax, 5);
                 grad[12] = 0;
                 grad[13] = 0;
                 grad[14] = 0;
@@ -396,21 +688,19 @@ namespace BipedRobot
                 grad[16] = 0;
                 grad[17] = 0;
             }
-            return p[6] - (p[6] + p[7] + p[8] + p[9] + p[10] + p[11]);
+            return p[6] + p[7] * _thetaMin + p[8] * Math.Pow(_thetaMin, 2) + p[9] * Math.Pow(_thetaMin, 3) + p[10] * Math.Pow(_thetaMin, 4) + p[11] * Math.Pow(_thetaMin, 5) -
+                (p[6] + p[7] * _thetaMax + p[8] * Math.Pow(_thetaMax, 2) + p[9] * Math.Pow(_thetaMax, 3) + p[10] * Math.Pow(_thetaMax, 4) + p[11] * Math.Pow(_thetaMax, 5));
         }
         public double geometryConstraint3(double[] p, double[] grad)
         {
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
             if (grad != null)
             {
-                grad[0] = -thetaMax;
-                grad[1] = -thetaMax;
-                grad[2] = -thetaMax;
-                grad[3] = -thetaMax;
-                grad[4] = -thetaMax;
-                grad[5] = -thetaMax;
+                grad[0] = -1;
+                grad[1] = -_thetaMax;
+                grad[2] = -Math.Pow(_thetaMax, 2);
+                grad[3] = -Math.Pow(_thetaMax, 3);
+                grad[4] = -Math.Pow(_thetaMax, 4);
+                grad[5] = -Math.Pow(_thetaMax, 5);
                 grad[6] = 0;
                 grad[7] = 0;
                 grad[8] = 0;
@@ -418,21 +708,176 @@ namespace BipedRobot
                 grad[10] = 0;
                 grad[11] = 0;
                 grad[12] = 1;
+                grad[13] = _thetaMin;
+                grad[14] = Math.Pow(_thetaMin, 2);
+                grad[15] = Math.Pow(_thetaMin, 3);
+                grad[16] = Math.Pow(_thetaMin, 4);
+                grad[17] = Math.Pow(_thetaMin, 5);
+            }
+            return p[12] + p[13] * _thetaMin + p[14] * Math.Pow(_thetaMin, 2) + p[15] * Math.Pow(_thetaMin, 3) + p[16] * Math.Pow(_thetaMin, 4) + p[17] * Math.Pow(_thetaMin, 5) -
+                (p[0] + p[1] * _thetaMax + p[2] * Math.Pow(_thetaMax, 2) + p[3] * Math.Pow(_thetaMax, 3) + p[4] * Math.Pow(_thetaMax, 4) + p[5] * Math.Pow(_thetaMax, 5));
+        }
+
+        public double geometryConstraint4(double[] p, double[] grad)
+        {
+
+            if (grad != null)
+            {
+                grad[0] = 1 + 1;
+                grad[1] = _thetaMin + _thetaMax;
+                grad[2] = Math.Pow(_thetaMin, 2) + Math.Pow(_thetaMax, 2);
+                grad[3] = Math.Pow(_thetaMin, 3) + Math.Pow(_thetaMax, 3);
+                grad[4] = Math.Pow(_thetaMin, 4) + Math.Pow(_thetaMax, 4);
+                grad[5] = Math.Pow(_thetaMin, 5) + Math.Pow(_thetaMax, 5);
+                grad[6] = 0;
+                grad[7] = 0;
+                grad[8] = 0;
+                grad[9] = 0;
+                grad[10] = 0;
+                grad[11] = 0;
+                grad[12] = 0;
                 grad[13] = 0;
                 grad[14] = 0;
                 grad[15] = 0;
                 grad[16] = 0;
                 grad[17] = 0;
             }
-            return p[12] - (p[0] + p[1] + p[2] + p[3] + p[4] + p[5]);
+            return p[0] + p[1] * _thetaMin + p[2] * Math.Pow(_thetaMin, 2) + p[3] * Math.Pow(_thetaMin, 3) + p[4] * Math.Pow(_thetaMin, 4) + p[5] * Math.Pow(_thetaMin, 5) +
+                p[0] + p[1] * _thetaMax + p[2] * Math.Pow(_thetaMax, 2) + p[3] * Math.Pow(_thetaMax, 3) + p[4] * Math.Pow(_thetaMax, 4) + p[5] * Math.Pow(_thetaMax, 5);
+        }
+        public double geometryConstraint5(double[] p, double[] grad)
+        {
+            if (grad != null)
+            {
+                grad[0] = 0;
+                grad[1] = 0;
+                grad[2] = 0;
+                grad[3] = 0;
+                grad[4] = 0;
+                grad[5] = 0;
+                grad[6] = 0;
+                grad[7] = _thetaMin - _thetaMax;
+                grad[8] = Math.Pow(_thetaMin, 2) - Math.Pow(_thetaMax, 2);
+                grad[9] = Math.Pow(_thetaMin, 3) - Math.Pow(_thetaMax, 3);
+                grad[10] = Math.Pow(_thetaMin, 4) - Math.Pow(_thetaMax, 4);
+                grad[11] = Math.Pow(_thetaMin, 5) - Math.Pow(_thetaMax, 5);
+                grad[12] = 0;
+                grad[13] = 0;
+                grad[14] = 0;
+                grad[15] = 0;
+                grad[16] = 0;
+                grad[17] = 0;
+            }
+            return p[6] + p[7] * _thetaMin + p[8] * Math.Pow(_thetaMin, 2) + p[9] * Math.Pow(_thetaMin, 3) + p[10] * Math.Pow(_thetaMin, 4) + p[11] * Math.Pow(_thetaMin, 5) -
+                p[6] + p[7] * _thetaMax + p[8] * Math.Pow(_thetaMax, 2) + p[9] * Math.Pow(_thetaMax, 3) + p[10] * Math.Pow(_thetaMax, 4) + p[11] * Math.Pow(_thetaMax, 5);
+        }
+        public double geometryConstraint6(double[] p, double[] grad)
+        {
+            if (grad != null)
+            {
+                grad[0] = 0;
+                grad[1] = 0;
+                grad[2] = 0;
+                grad[3] = 0;
+                grad[4] = 0;
+                grad[5] = 0;
+                grad[6] = 0;
+                grad[7] = 0;
+                grad[8] = 0;
+                grad[9] = 0;
+                grad[10] = 0;
+                grad[11] = 0;
+                grad[12] = 1 + 1;
+                grad[13] = _thetaMin + _thetaMax;
+                grad[14] = Math.Pow(_thetaMin, 2) + Math.Pow(_thetaMax, 2);
+                grad[15] = Math.Pow(_thetaMin, 3) + Math.Pow(_thetaMax, 3);
+                grad[16] = Math.Pow(_thetaMin, 4) + Math.Pow(_thetaMax, 4);
+                grad[17] = Math.Pow(_thetaMin, 5) + Math.Pow(_thetaMax, 5);
+            }
+            return p[12] + p[13] * _thetaMin + p[14] * Math.Pow(_thetaMin, 2) + p[15] * Math.Pow(_thetaMin, 3) + p[16] * Math.Pow(_thetaMin, 4) + p[17] * Math.Pow(_thetaMin, 5) +
+                p[12] + p[13] * _thetaMax + p[14] * Math.Pow(_thetaMax, 2) + p[15] * Math.Pow(_thetaMax, 3) + p[16] * Math.Pow(_thetaMax, 4) + p[17] * Math.Pow(_thetaMax, 5);
+        }
+
+        public double geometryConstraint7(double[] p, double[] grad)
+        {
+
+            if (grad != null)
+            {
+                grad[0] = 1;
+                grad[1] = _thetaMin;
+                grad[2] = Math.Pow(_thetaMin, 2);
+                grad[3] = Math.Pow(_thetaMin, 3);
+                grad[4] = Math.Pow(_thetaMin, 4);
+                grad[5] = Math.Pow(_thetaMin, 5);
+                grad[6] = 0;
+                grad[7] = 0;
+                grad[8] = 0;
+                grad[9] = 0;
+                grad[10] = 0;
+                grad[11] = 0;
+                grad[12] = 0;
+                grad[13] = 0;
+                grad[14] = 0;
+                grad[15] = 0;
+                grad[16] = 0;
+                grad[17] = 0;
+            }
+            return p[0] + p[1] * _thetaMin + p[2] * Math.Pow(_thetaMin, 2) + p[3] * Math.Pow(_thetaMin, 3) + p[4] * Math.Pow(_thetaMin, 4) + p[5] * Math.Pow(_thetaMin, 5) - _q1;
+        }
+        public double geometryConstraint8(double[] p, double[] grad)
+        {
+            if (grad != null)
+            {
+                grad[0] = 0;
+                grad[1] = 0;
+                grad[2] = 0;
+                grad[3] = 0;
+                grad[4] = 0;
+                grad[5] = 0;
+                grad[6] = 1;
+                grad[7] = _thetaMin;
+                grad[8] = Math.Pow(_thetaMin, 2);
+                grad[9] = Math.Pow(_thetaMin, 3);
+                grad[10] = Math.Pow(_thetaMin, 4);
+                grad[11] = Math.Pow(_thetaMin, 5);
+                grad[12] = 0;
+                grad[13] = 0;
+                grad[14] = 0;
+                grad[15] = 0;
+                grad[16] = 0;
+                grad[17] = 0;
+            }
+            return p[6] + p[7] * _thetaMin + p[8] * Math.Pow(_thetaMin, 2) + p[9] * Math.Pow(_thetaMin, 3) + p[10] * Math.Pow(_thetaMin, 4) + p[11] * Math.Pow(_thetaMin, 5) - _q2;
+        }
+        public double geometryConstraint9(double[] p, double[] grad)
+        {
+            if (grad != null)
+            {
+                grad[0] = 0;
+                grad[1] = 0;
+                grad[2] = 0;
+                grad[3] = 0;
+                grad[4] = 0;
+                grad[5] = 0;
+                grad[6] = 0;
+                grad[7] = 0;
+                grad[8] = 0;
+                grad[9] = 0;
+                grad[10] = 0;
+                grad[11] = 0;
+                grad[12] = 1;
+                grad[13] = _thetaMin;
+                grad[14] = Math.Pow(_thetaMin, 2);
+                grad[15] = Math.Pow(_thetaMin, 3);
+                grad[16] = Math.Pow(_thetaMin, 4);
+                grad[17] = Math.Pow(_thetaMin, 5);
+            }
+            return p[12] + p[13] * _thetaMin + p[14] * Math.Pow(_thetaMin, 2) + p[15] * Math.Pow(_thetaMin, 3) + p[16] * Math.Pow(_thetaMin, 4) + p[17] * Math.Pow(_thetaMin, 5) - _q3;
         }
 
         public double alphaMaxConstraint(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -449,14 +894,14 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double alpha = evaluateAlphaConstraint(thetaMin, thetaMax);
+            double alpha = evaluateAlphaConstraint(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double gradValue;
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateAlphaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateAlphaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - alpha) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -464,7 +909,7 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateAlphaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateAlphaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - alpha) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -472,7 +917,7 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateAlphaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateAlphaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - alpha) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -483,9 +928,6 @@ namespace BipedRobot
         public double dthetaConstraint(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -502,14 +944,14 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double dthetaMin = evaluateDthetaConstraint(thetaMin, thetaMax);
+            double dthetaMin = evaluateDthetaConstraint(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double gradValue;
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - dthetaMin) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -517,7 +959,7 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - dthetaMin) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -525,7 +967,7 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = evaluateDthetaConstraint(thetaMin, thetaMax);
+                    gradValue = evaluateDthetaConstraint(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - dthetaMin) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -536,9 +978,6 @@ namespace BipedRobot
         public double impactConstraint1(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -555,14 +994,14 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double impactValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
+            double impactValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double gradValue;
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -570,7 +1009,7 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -578,7 +1017,7 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactSecondLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactSecondLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -589,9 +1028,6 @@ namespace BipedRobot
         public double impactConstraint2(double[] p, double[] grad)
         {
             int len = p.Length / 3;
-            double[] theta = thetaRange(p[0], p[6], p[12]);
-            double thetaMin = theta[0];
-            double thetaMax = theta[1];
 
             for (int i = 0; i < len; i++)
             {
@@ -608,14 +1044,14 @@ namespace BipedRobot
                 _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
             }
-            double impactValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+            double impactValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
             if (grad != null)
             {
                 double gradValue;
                 for (int i = 0; i < len; i++)
                 {
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi1Parameters["P" + i.ToString()] = p[i];
 
@@ -623,7 +1059,7 @@ namespace BipedRobot
                 for (int i = len; i < 2 * len; i++)
                 {
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi2Parameters["P" + i.ToString()] = p[i];
 
@@ -631,7 +1067,7 @@ namespace BipedRobot
                 for (int i = 2 * len; i < 3 * len; i++)
                 {
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i] + _step;
-                    gradValue = _gait.impactFirstLine(thetaMin, thetaMax) - _gait.impactThirdLine(thetaMin, thetaMax);
+                    gradValue = _gait.impactFirstLine(_thetaMin, _thetaMax) - _gait.impactThirdLine(_thetaMin, _thetaMax);
                     grad[i] = (gradValue - impactValue) / _step;
                     _gait.vhc.phi3Parameters["P" + i.ToString()] = p[i];
 
@@ -723,24 +1159,23 @@ namespace BipedRobot
             return values;
         }
 
-        public double[] thetaRange(double P0, double P6, double P12)
+        public void thetaRange(double q1, double q2, double q3)
         {
             double a = -(_param.m1 * _param.l1 + _param.m2 * _param.L1 + _param.m3 * _param.L1) / (_param.m1 + _param.m2 + _param.m3);
             double b = -(_param.m2 * _param.l2) / (_param.m1 + _param.m2 + _param.m3);
-            double c = -(_param.m3 * _param.l3) / (_param.m1 + _param.m2 + _param.m3);
-            double thetaMin = a * P0 + b * P6 + c * P12;
-            double thetaMax = a * (-P0) + b * (P6) + c * (-P12);
-            return new double[] { thetaMin, thetaMax };
+            double c = (_param.m3 * _param.l3) / (_param.m1 + _param.m2 + _param.m3);
+            _thetaMin = a * q1 + b * q2 + c * q3;
+            _thetaMax = a * (-q1) + b * (q2) + c * (-q3);
         }
         public double evaluateAlphaConstraint(double thetaMin, double thetaMax)
         {
 
-
-            double dx = 0.02;
+            double steps = 50;
+            double dx = (thetaMax - thetaMin) / steps;
             double theta = thetaMin;
             double val = double.MinValue;
             double alphaVal = 0;
-            for (int i = 0; i < thetaMax / dx; i++)
+            for (int i = 0; i < steps; i++)
             {
                 alphaVal = _gait.vhc.evalAlpha(theta);
                 if (alphaVal > val)

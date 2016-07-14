@@ -41,6 +41,7 @@ namespace BipedRobot
             trajectoryChart.Series["q2"].Color = Color.Blue;
             trajectoryChart.Series["q3"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             trajectoryChart.Series["q3"].Color = Color.Green;
+            trajectoryChart.SaveImage(@"../../../../pictures/trajectory.png", System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }

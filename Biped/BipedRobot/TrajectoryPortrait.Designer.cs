@@ -1,6 +1,6 @@
 ﻿namespace BipedRobot
 {
-    partial class Phaseportrait
+    partial class TrajectoryPortrait
     {
         /// <summary>
         /// Required designer variable.
@@ -31,58 +31,66 @@
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            this.dynamicsChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            this.trajectoryPortraitChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.button1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trajectoryPortraitChart)).BeginInit();
             this.SuspendLayout();
             // 
-            // dynamicsChart
+            // trajectoryPortraitChart
             // 
             chartArea1.Name = "ChartArea1";
-            this.dynamicsChart.ChartAreas.Add(chartArea1);
+            this.trajectoryPortraitChart.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
-            this.dynamicsChart.Legends.Add(legend1);
-            this.dynamicsChart.Location = new System.Drawing.Point(85, 28);
-            this.dynamicsChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.dynamicsChart.Name = "dynamicsChart";
+            this.trajectoryPortraitChart.Legends.Add(legend1);
+            this.trajectoryPortraitChart.Location = new System.Drawing.Point(67, 3);
+            this.trajectoryPortraitChart.Margin = new System.Windows.Forms.Padding(4);
+            this.trajectoryPortraitChart.Name = "trajectoryPortraitChart";
             series1.ChartArea = "ChartArea1";
             series1.Legend = "Legend1";
-            series1.Name = "Phaseportrait";
-            this.dynamicsChart.Series.Add(series1);
-            this.dynamicsChart.Size = new System.Drawing.Size(939, 601);
-            this.dynamicsChart.TabIndex = 1;
-            this.dynamicsChart.Text = "chart1";
+            series1.Name = "q1";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "q2";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "q3";
+            this.trajectoryPortraitChart.Series.Add(series1);
+            this.trajectoryPortraitChart.Series.Add(series2);
+            this.trajectoryPortraitChart.Series.Add(series3);
+            this.trajectoryPortraitChart.Size = new System.Drawing.Size(939, 601);
+            this.trajectoryPortraitChart.TabIndex = 4;
+            this.trajectoryPortraitChart.Text = "chart1";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(881, 647);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Location = new System.Drawing.Point(900, 612);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(143, 44);
-            this.button1.TabIndex = 2;
+            this.button1.TabIndex = 5;
             this.button1.Text = "Plot";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // Phaseportrait
+            // TrajectoryPortrait
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1165, 768);
+            this.ClientSize = new System.Drawing.Size(1080, 680);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.dynamicsChart);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.Name = "Phaseportrait";
-            this.Text = "Phaseportrait";
-            this.Load += new System.EventHandler(this.Phaseportrait_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dynamicsChart)).EndInit();
+            this.Controls.Add(this.trajectoryPortraitChart);
+            this.Name = "TrajectoryPortrait";
+            this.Text = "TrajectoryPortrait";
+            ((System.ComponentModel.ISupportInitialize)(this.trajectoryPortraitChart)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.DataVisualization.Charting.Chart dynamicsChart;
+        private System.Windows.Forms.DataVisualization.Charting.Chart trajectoryPortraitChart;
         private System.Windows.Forms.Button button1;
     }
 }

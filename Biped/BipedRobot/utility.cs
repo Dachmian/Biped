@@ -219,7 +219,7 @@ namespace BipedRobot{
         {
             BRReducedSimulationData data = new BRReducedSimulationData(0.001, Vector<double>.Build.Dense(new double[] { integrationStart[0], integrationStart[1],
                 BRReducedDynamics.rhs1D(integrationStart, vhc.evalAlpha, vhc.evalBeta, vhc.evalGamma)}));
-            int i = 0;
+            int i = 1;
             Vector<double> oneStep = integrationStart;
             while (true){
 				oneStep = rk4(oneStep, data.timestep, vhc);

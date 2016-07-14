@@ -34,6 +34,7 @@ namespace BipedRobot
             torquesChart.Series["Torque1"].Color = Color.Red;
             torquesChart.Series["Torque2"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
             torquesChart.Series["Torque2"].Color = Color.Blue;
+            torquesChart.SaveImage(@"../../../../pictures/torques.png", System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }

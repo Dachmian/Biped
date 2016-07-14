@@ -31,10 +31,11 @@ namespace BipedRobot
             {
                 double theta = _THETA[0, i];
                 double dtheta = _THETA[1, i];
-                dynamicsChart.Series["dtheta"].Points.AddXY(theta, dtheta);
+                dynamicsChart.Series["Phaseportrait"].Points.AddXY(theta, dtheta);
             }
-            dynamicsChart.Series["dtheta"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            dynamicsChart.Series["dtheta"].Color = Color.Red;
+            dynamicsChart.Series["Phaseportrait"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            dynamicsChart.Series["Phaseportrait"].Color = Color.Red;
+            dynamicsChart.SaveImage(@"../../../../pictures/phaseIntegral.png", System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }
